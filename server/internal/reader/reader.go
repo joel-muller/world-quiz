@@ -54,7 +54,7 @@ func readAndApply(filename string, places *[]entities.Place, operator func([]str
 
 func addIds(places *[]entities.Place) {
 	for i := range *places {
-		(*places)[i].Id = i
+		(*places)[i].Id = i + 1
 	}
 }
 
