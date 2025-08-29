@@ -29,6 +29,32 @@ func (p Place) String() string {
 	)
 }
 
+func (p Place) GetCard(c Category) Card {
+	switch c {
+	case NameCapital:
+		return Card{c, p.Name, p.PlaceInfo, p.Capital, p.CapitalInfo}
+	case CapitalName:
+		return Card{c, p.Capital, p.CapitalInfo, p.Name, p.PlaceInfo}
+	case FlagName:
+		return Card{c, p.Flag, "", p.nameWithCapital(), p.bothInfos()}
+	case MapName:
+		return Card{c, p.Maps, "", p.nameWithCapital(), p.bothInfos()}
+	default:
+		return Card{}
+	}
+}
+
+func (p Place) nameWithCapital() string {
+	if p.Capital != "" {
+		return fmt.Sprintf("%s (%s)", p.Name, p.Capital)
+	}
+	return p.Name
+}
+
+func (p Place) bothInfos() string {
+	return fmt.Sprintf("%s %s", p.Name, p.Capital)
+}
+
 func valueOrEmpty(s string) string {
 	if s == "" {
 		return "empty"
