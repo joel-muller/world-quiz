@@ -8,3 +8,7 @@ const (
 	CapitalName
 	NameCapital
 )
+
+func (t Category) Valid() bool {
+	return t >= MapName && t <= NameCapital
+}

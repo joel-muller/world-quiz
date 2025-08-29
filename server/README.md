@@ -24,3 +24,27 @@ Game
 
 User
 - was auch immer es braucht
+
+## TODO Server
+
+- [ ] Get Real id with UUID instead of int 1 for a game
+- [ ] Save the game and remove it from the manager
+- [ ] Write test
+
+## Server
+
+```shell
+curl -X GET http://localhost:8080/hello
+```
+
+```shell
+curl -X POST http://localhost:8080/echo \
+     -H "Content-Type: application/json" \
+     -d '{"text":"Hello Go"}'
+```
+
+```shell
+curl -X POST http://localhost:8080/game \
+  -H "Content-Type: application/json" \
+  -d '{"category": 10, "tags": [0, 1]}'
+```

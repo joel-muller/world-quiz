@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
+	"net/http"
 	"world-quiz/internal/entities"
 	"world-quiz/internal/game"
 	"world-quiz/internal/reader"
@@ -13,20 +14,36 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	manager := game.NewManager(&places)
 
-	gameManager := game.GameManager{Places: places, Games: map[int]*game.Game{}}
-	gameId := gameManager.NewGame(entities.MapName, []entities.Tag{entities.Africa})
+	log.Println("World Quiz server is ready")
 
-	for gameManager.GetGame(gameId).Active() {
-		fmt.Println(gameManager.GetGame(gameId).CurrentCard().Front)
-		var i, j string
-		fmt.Scan(&j)
-		fmt.Println(gameManager.GetGame(gameId).CurrentCard().Back)
-		fmt.Scan(&i)
-		if i == "y" {
-			gameManager.GetGame(gameId).Guess(true)
-		} else {
-			gameManager.GetGame(gameId).Guess(false)
+	http.HandleFunc("/game", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
 		}
-	}
+
+		var req entities.GameRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+		defer r.Body.Close()
+
+		game, err := manager.CreateGame(req.Category, req.Tags)
+		if err != nil {
+			http.Error(w, "Invalid Category or Tag: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(game); err != nil {
+			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+			return
+		}
+	})
+
+	log.Println("Server running on http://localhost:8080")
+	http.ListenAndServe(":8080", nil)
 }

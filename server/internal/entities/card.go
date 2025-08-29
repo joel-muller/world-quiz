@@ -1,7 +1,7 @@
 package entities
 
 type Card struct {
-	Category  Category
+	PlaceId   int
 	Front     string
 	InfoFront string
 	Back      string

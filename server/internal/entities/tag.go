@@ -19,3 +19,7 @@ const (
 	Southeast_Asia
 	Caribbean
 )
+
+func (t Tag) Valid() bool {
+	return t >= Europe && t <= Caribbean
+}
