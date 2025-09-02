@@ -10,8 +10,7 @@ import (
 	"world-quiz/internal/entities"
 )
 
-func Read() ([]entities.Place, error) {
-	path := "data/"
+func Read(path string) ([]entities.Place, error) {
 	places := []entities.Place{}
 	if err := readAndApply(path+"main.csv", &places, applyLineMain); err != nil {
 		return []entities.Place{}, err

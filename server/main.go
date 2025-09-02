@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	places, err := reader.Read()
+	places, err := reader.Read("data/")
 	if err != nil {
 		log.Fatal(err)
 	}
