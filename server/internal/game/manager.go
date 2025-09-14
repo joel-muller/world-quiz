@@ -2,13 +2,14 @@ package game
 
 import (
 	"errors"
+	"github.com/google/uuid"
 	"world-quiz/internal/entities"
 	"world-quiz/internal/filter"
 )
 
 type Manager struct {
 	Places *[]entities.Place
-	Games  map[int]entities.Game
+	Games  map[uuid.UUID]entities.Game
 }
 
 func (m *Manager) CreateGame(c entities.Category, t []entities.Tag) (entities.Game, error) {
@@ -20,14 +21,14 @@ func (m *Manager) CreateGame(c entities.Category, t []entities.Tag) (entities.Ga
 	for _, p := range places {
 		cards = append(cards, p.GetCard(c))
 	}
-	gameId := 1
+	gameId := uuid.New()
 	game := entities.Game{Id: gameId, Category: c, Cards: cards}
 	m.Games[gameId] = game
 	return game, nil
 }
 
 func NewManager(p *[]entities.Place) *Manager {
-	return &Manager{Places: p, Games: map[int]entities.Game{}}
+	return &Manager{Places: p, Games: map[uuid.UUID]entities.Game{}}
 }
 
 func validRequest(c entities.Category, t []entities.Tag) bool {

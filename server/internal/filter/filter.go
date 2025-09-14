@@ -33,7 +33,7 @@ func filterCategory(places *[]entities.Place, category entities.Category) []enti
 func filterTags(places []entities.Place, tags []entities.Tag) []entities.Place {
 	filtered := []entities.Place{}
 	for _, p := range places {
-		if inTags(p, tags) {
+		if inTags(p, tags) || len(tags) == 0 {
 			filtered = append(filtered, p)
 		}
 	}
@@ -41,9 +41,6 @@ func filterTags(places []entities.Place, tags []entities.Tag) []entities.Place {
 }
 
 func inTags(place entities.Place, tags []entities.Tag) bool {
-	if len(tags) == 0 {
-		return true
-	}
 	for _, t := range tags {
 		if slices.Contains(place.Tags, t) {
 			return true
