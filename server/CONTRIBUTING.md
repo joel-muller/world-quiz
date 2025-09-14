@@ -2,7 +2,7 @@
 
 ## Commit Message
 
-```
+```txt
 <type> - <short-description>
 ```
 
