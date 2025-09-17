@@ -1,0 +1,8 @@
+<p>quiz-manager works!</p>
+
+@if (quiz) {
+  <h2>Quiz ID: {{ quiz.Id }}</h2>
+  @for (card of cards; track card.PlaceId) {
+    <strong>{{ card.Front }} {{ card.Back }}</strong>
+  }
+}
