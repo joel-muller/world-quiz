@@ -1,0 +1,50 @@
+@if (isActive()) {
+  <div class="quiz-card">
+    @switch (getCurrentCategory()) {
+      @case (0) {
+        <img class="quiz-image" [src]="'/media/maps/' + getCurrentFront()" alt="Map" />
+      }
+      @case (1) {
+        <img class="quiz-image" [src]="'/media/flags/' + getCurrentFront()" alt="Flag" />
+      }
+      @case (2) {
+        <p class="quiz-question">
+          In which place is the Capital <strong>{{ getCurrentFront() }}</strong
+          >?
+        </p>
+      }
+      @default {
+        <p class="quiz-question">
+          Guess the Capital of <strong>{{ getCurrentFront() }}</strong>
+        </p>
+      }
+    }
+    <p class="quiz-info">{{ getCurrentInfoFront() }}</p>
+
+    <hr />
+
+    @if (showBack) {
+      <div class="quiz-back">
+        <p>{{ getCurrentBack() }}</p>
+        <p class="quiz-info">{{ getCurrentInfoBack() }}</p>
+      </div>
+    }
+
+    <div class="quiz-actions">
+      <button class="btn" (click)="toggleBack()">
+        {{ getTextCardFlipper() }}
+      </button>
+      <button class="btn btn-success" (click)="guess(true)">Guessed Right</button>
+      <button class="btn btn-danger" (click)="guess(false)">Guessed Wrong</button>
+    </div>
+  </div>
+} @else {
+  <div class="quiz-complete">
+    <p>🎉 Congratulations, you finished the quiz!</p>
+  </div>
+}
+
+<div class="quiz-footer">
+  <p>{{ cards.length }} cards left</p>
+  <button class="btn btn-secondary" (click)="finishQuiz()">Finish Quiz</button>
+</div>

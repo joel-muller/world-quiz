@@ -1,20 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-export interface Card {
-  PlaceId: number;
-  Front: string;
-  InfoFront: string;
-  Back: string;
-  InfoBack: string;
-}
-
-export interface Quiz {
-  Id: string;
-  Category: number;
-  Cards: Card[];
-}
+import { Quiz } from './entities/Quiz';
 
 @Injectable({
   providedIn: 'root',
@@ -24,9 +11,13 @@ export class QuizService {
 
   constructor(private http: HttpClient) {}
 
-  startQuiz(category: number, tags: number[]): Observable<Quiz> {
+  fetchQuiz(categories: number[], tags: number[], number: number | undefined): Observable<Quiz> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const body = { category, tags };
+    if (number) {
+      const body = { categories, tags, number };
+      return this.http.post<Quiz>(this.apiUrl, body, { headers });
+    }
+    const body = { categories, tags };
     return this.http.post<Quiz>(this.apiUrl, body, { headers });
   }
 }
