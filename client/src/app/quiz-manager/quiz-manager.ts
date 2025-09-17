@@ -5,7 +5,7 @@ import { Quiz, QuizService, Card } from '../quiz-service';
   selector: 'app-quiz-manager',
   imports: [],
   templateUrl: './quiz-manager.html',
-  styleUrl: './quiz-manager.css'
+  styleUrl: './quiz-manager.css',
 })
 export class QuizManager {
   quiz: Quiz | null = null;
@@ -19,7 +19,7 @@ export class QuizManager {
         this.quiz = data;
         this.cards = this.quiz.Cards;
       },
-      error: (err) => console.error(err)
+      error: (err) => console.error(err),
     });
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 export interface Card {
   PlaceId: number;
@@ -17,12 +17,12 @@ export interface Quiz {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class QuizService {
   private apiUrl = 'http://localhost:8080/game';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   startQuiz(category: number, tags: number[]): Observable<Quiz> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
