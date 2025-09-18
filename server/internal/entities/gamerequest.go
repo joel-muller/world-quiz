@@ -1,6 +1,7 @@
 package entities
 
 type GameRequest struct {
-	Category []Category `json:"category"`
-	Tags     []Tag      `json:"tags"`
+	Categories []Category `json:"categories"`
+	Tags       []Tag      `json:"tags"`
+	Number     int        `json:"number"`
 }

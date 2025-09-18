@@ -12,11 +12,11 @@ type Manager struct {
 	Games  map[uuid.UUID]entities.Game
 }
 
-func (m *Manager) CreateGame(c []entities.Category, t []entities.Tag) (entities.Game, error) {
+func (m *Manager) CreateGame(c []entities.Category, t []entities.Tag, n int) (entities.Game, error) {
 	if !validRequest(c, t) {
 		return entities.Game{}, errors.New("Not valid Category or Tag")
 	}
-	cards := filter.Filter(m.Places, c, t)
+	cards := filter.Filter(m.Places, c, t, n)
 	gameId := uuid.New()
 	game := entities.Game{Id: gameId, Cards: cards}
 	m.Games[gameId] = game

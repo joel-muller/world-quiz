@@ -38,9 +38,9 @@ func (p Place) GetCard(c Category) Card {
 	case CapitalName:
 		return Card{p.Id, c, p.Capital, p.CapitalInfo, p.Name, p.PlaceInfo}
 	case FlagName:
-		return Card{p.Id, c, p.Flag, "", p.nameWithCapital(), p.bothInfos()}
+		return Card{p.Id, c, p.Flag, "", p.nameWithCapital(), p.backFlagInfo()}
 	case MapName:
-		return Card{p.Id, c, p.Maps, "", p.nameWithCapital(), p.bothInfos()}
+		return Card{p.Id, c, p.Maps, "", p.nameWithCapital(), p.backMapInfo()}
 	default:
 		return Card{}
 	}
@@ -53,7 +53,11 @@ func (p Place) nameWithCapital() string {
 	return p.Name
 }
 
-func (p Place) bothInfos() string {
+func (p Place) backMapInfo() string {
+	return fmt.Sprintf("%s %s", p.PlaceInfo, p.CapitalInfo)
+}
+
+func (p Place) backFlagInfo() string {
 	return fmt.Sprintf("%s %s %s", p.PlaceInfo, p.CapitalInfo, p.FlagInfo)
 }
 

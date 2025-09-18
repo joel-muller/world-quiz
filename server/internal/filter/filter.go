@@ -1,13 +1,20 @@
 package filter
 
 import (
+	"math/rand"
 	"slices"
+	"time"
 	"world-quiz/internal/entities"
 )
 
-func Filter(places *[]entities.Place, categories []entities.Category, tags []entities.Tag) []entities.Card {
-	filteredTags := filterTags(places, tags)
-	return filterCategory(&filteredTags, categories)
+func Filter(places *[]entities.Place, categories []entities.Category, tags []entities.Tag, number int) []entities.Card {
+	filtered := filterTags(places, tags)
+	cards := filterCategory(&filtered, categories)
+	shuffleCards(&cards)
+	if len(cards) >= number {
+		return cards[:number]
+	}
+	return cards
 }
 
 func filterCategory(places *[]entities.Place, categories []entities.Category) []entities.Card {
@@ -55,4 +62,11 @@ func isValid(place entities.Place) bool {
 		return true
 	}
 	return false
+}
+
+func shuffleCards(cards *[]entities.Card) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	r.Shuffle(len(*cards), func(i, j int) {
+		(*cards)[i], (*cards)[j] = (*cards)[j], (*cards)[i]
+	})
 }

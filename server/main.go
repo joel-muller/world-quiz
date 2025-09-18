@@ -43,7 +43,7 @@ func main() {
 		}
 		defer r.Body.Close()
 
-		game, err := manager.CreateGame(req.Category, req.Tags)
+		game, err := manager.CreateGame(req.Categories, req.Tags, req.Number)
 		if err != nil {
 			http.Error(w, "Invalid Category or Tag: "+err.Error(), http.StatusBadRequest)
 			return
