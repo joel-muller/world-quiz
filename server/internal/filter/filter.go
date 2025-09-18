@@ -13,6 +13,9 @@ func Filter(places *[]entities.Place, request entities.GameRequest) []entities.C
 	shuffleCards(&cards)
 	if request.Number != nil {
 		number := *request.Number
+		if len(cards) < number {
+			return cards
+		}
 		return cards[:number]
 	}
 	return cards
