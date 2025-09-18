@@ -11,12 +11,13 @@ type Place struct {
 	RegionCode  string
 	Maps        string
 	Flag        string
+	FlagInfo    string
 	Tags        []Tag
 }
 
 func (p Place) String() string {
 	return fmt.Sprintf(
-		"ID: %v, Name: %s, PlaceInfo: %s, Capital: %s, CapitalInfo: %s, RegionCode: %s, Maps: %s, Flag: %s, Tags: %v",
+		"ID: %v, Name: %s, PlaceInfo: %s, Capital: %s, CapitalInfo: %s, RegionCode: %s, Maps: %s, Flag: %s, FlagInfo: %s, Tags: %v",
 		p.Id,
 		valueOrEmpty(p.Name),
 		valueOrEmpty(p.PlaceInfo),
@@ -25,6 +26,7 @@ func (p Place) String() string {
 		valueOrEmpty(p.RegionCode),
 		valueOrEmpty(p.Maps),
 		valueOrEmpty(p.Flag),
+		valueOrEmpty(p.FlagInfo),
 		p.Tags,
 	)
 }
@@ -32,13 +34,13 @@ func (p Place) String() string {
 func (p Place) GetCard(c Category) Card {
 	switch c {
 	case NameCapital:
-		return Card{p.Id, p.Name, p.PlaceInfo, p.Capital, p.CapitalInfo}
+		return Card{p.Id, c, p.Name, p.PlaceInfo, p.Capital, p.CapitalInfo}
 	case CapitalName:
-		return Card{p.Id, p.Capital, p.CapitalInfo, p.Name, p.PlaceInfo}
+		return Card{p.Id, c, p.Capital, p.CapitalInfo, p.Name, p.PlaceInfo}
 	case FlagName:
-		return Card{p.Id, p.Flag, "", p.nameWithCapital(), p.bothInfos()}
+		return Card{p.Id, c, p.Flag, "", p.nameWithCapital(), p.bothInfos()}
 	case MapName:
-		return Card{p.Id, p.Maps, "", p.nameWithCapital(), p.bothInfos()}
+		return Card{p.Id, c, p.Maps, "", p.nameWithCapital(), p.bothInfos()}
 	default:
 		return Card{}
 	}
@@ -52,7 +54,7 @@ func (p Place) nameWithCapital() string {
 }
 
 func (p Place) bothInfos() string {
-	return fmt.Sprintf("%s %s", p.Name, p.Capital)
+	return fmt.Sprintf("%s %s %s", p.PlaceInfo, p.CapitalInfo, p.FlagInfo)
 }
 
 func valueOrEmpty(s string) string {

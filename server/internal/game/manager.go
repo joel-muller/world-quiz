@@ -12,17 +12,13 @@ type Manager struct {
 	Games  map[uuid.UUID]entities.Game
 }
 
-func (m *Manager) CreateGame(c entities.Category, t []entities.Tag) (entities.Game, error) {
+func (m *Manager) CreateGame(c []entities.Category, t []entities.Tag) (entities.Game, error) {
 	if !validRequest(c, t) {
 		return entities.Game{}, errors.New("Not valid Category or Tag")
 	}
-	places := filter.Filter(m.Places, c, t)
-	cards := []entities.Card{}
-	for _, p := range places {
-		cards = append(cards, p.GetCard(c))
-	}
+	cards := filter.Filter(m.Places, c, t)
 	gameId := uuid.New()
-	game := entities.Game{Id: gameId, Category: c, Cards: cards}
+	game := entities.Game{Id: gameId, Cards: cards}
 	m.Games[gameId] = game
 	return game, nil
 }
@@ -31,11 +27,19 @@ func NewManager(p *[]entities.Place) *Manager {
 	return &Manager{Places: p, Games: map[uuid.UUID]entities.Game{}}
 }
 
-func validRequest(c entities.Category, t []entities.Tag) bool {
-	for _, v := range t {
-		if !v.Valid() {
+func validRequest(c []entities.Category, t []entities.Tag) bool {
+	if len(c) == 0 {
+		return false
+	}
+	for _, category := range c {
+		if !category.Valid() {
 			return false
 		}
 	}
-	return c.Valid()
+	for _, tag := range t {
+		if !tag.Valid() {
+			return false
+		}
+	}
+	return true
 }

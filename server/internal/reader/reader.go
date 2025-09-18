@@ -19,6 +19,7 @@ var fileProcessors = []fileProcessor{
 	{"capital.csv", applyLineCapital},
 	{"capital_info.csv", applyLineCapitalInfo},
 	{"country_info.csv", applyLineCountryInfo},
+	{"flag_similarity.csv", applyFlagSimilarity},
 }
 
 var tagsList = map[string]entities.Tag{
@@ -107,6 +108,14 @@ func applyLineCountryInfo(count int, record []string, places *[]entities.Place) 
 	for i := range *places {
 		if (*places)[i].Name == record[0] {
 			(*places)[i].PlaceInfo = record[1]
+		}
+	}
+}
+
+func applyFlagSimilarity(count int, record []string, places *[]entities.Place) {
+	for i := range *places {
+		if (*places)[i].Name == record[0] {
+			(*places)[i].FlagInfo = record[1]
 		}
 	}
 }
