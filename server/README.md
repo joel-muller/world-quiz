@@ -4,47 +4,24 @@
 
 - **Countries, Continents, Oceans and Seas**: Ultimate Geography v5.3 ([Anki Deck](https://ankiweb.net/shared/info/2109889812), [Github Page](https://github.com/anki-geo/ultimate-geography/tree/master))
 
+### Build and Run
 
-## Notes
+You can build the binary with:
 
-Record.go, hat:
-- id record
-- id iduser
-- id game
-- id card
-- ob loesen konnen, 
-- zeit wann gelost
-- category eg. mapname, flagname, capitalname, namecapital
-
-Game
-- id game
-- id user
-- cards solved
-- games ist einfach für statistik, der algorithmus leitet das ganze aud den records ab
-
-User
-- was auch immer es braucht
-
-## TODO Server
-
-- [ ] Get Real id with UUID instead of int 1 for a game
-- [ ] Save the game and remove it from the manager
-- [ ] Write test
-
-## Server
-
-```shell
-curl -X GET http://localhost:8080/hello
+```bash
+./scripts/package.sh
 ```
 
-```shell
-curl -X POST http://localhost:8080/echo \
-     -H "Content-Type: application/json" \
-     -d '{"text":"Hello Go"}'
+Then run the compiled executable:
+
+```bash
+./world-quiz
 ```
 
-```shell
-curl -X POST http://localhost:8080/game \
-  -H "Content-Type: application/json" \
-  -d '{"category": 10, "tags": [0, 1]}'
+### Run Without Building
+
+Alternatively, you can run the project directly with Go:
+
+```bash
+go run .
 ```
