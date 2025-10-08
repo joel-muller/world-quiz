@@ -43,28 +43,30 @@ var tagsList = map[string]entities.Tag{
 func Read() ([]entities.Place, error) {
 	places := []entities.Place{}
 	for _, f := range fileProcessors {
-		reader, err := getReader(f.name)
+		reader, file, err := getReader(f.name)
 		if err != nil {
 			return []entities.Place{}, err
 		}
 		if err := readAndApply(reader, &places, f.operator); err != nil {
 			return []entities.Place{}, err
 		}
+		file.Close()
 	}
 	return places, nil
 }
 
-func getReader(filename string) (*csv.Reader, error) {
+func getReader(filename string) (*csv.Reader, *os.File, error) {
 	path := "data/"
-	f, err := os.Open(path + filename)
+	file, err := os.Open(path + filename)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	csvreader := csv.NewReader(f)
+	csvreader := csv.NewReader(file)
+	// Read the first line
 	if _, err := csvreader.Read(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return csvreader, nil
+	return csvreader, file, nil
 }
 
 func readAndApply(r *csv.Reader, places *[]entities.Place, operator func(int, []string, *[]entities.Place)) error {
@@ -88,35 +90,36 @@ func applyLineMain(count int, record []string, places *[]entities.Place) {
 	*places = append(*places, place)
 }
 
-func applyLineCapital(count int, record []string, places *[]entities.Place) {
+func getPlaceByName(name string, places *[]entities.Place) *entities.Place {
 	for i := range *places {
-		if (*places)[i].Name == record[0] {
-			(*places)[i].Capital = record[1]
+		if (*places)[i].Name == name {
+			return &(*places)[i]
 		}
+	}
+	return nil
+}
+
+func applyLineCapital(count int, record []string, places *[]entities.Place) {
+	if p := getPlaceByName(record[0], places); p != nil {
+		p.Capital = record[1]
 	}
 }
 
 func applyLineCapitalInfo(count int, record []string, places *[]entities.Place) {
-	for i := range *places {
-		if (*places)[i].Name == record[0] {
-			(*places)[i].CapitalInfo = record[1]
-		}
+	if p := getPlaceByName(record[0], places); p != nil {
+		p.CapitalInfo = record[1]
 	}
 }
 
 func applyLineCountryInfo(count int, record []string, places *[]entities.Place) {
-	for i := range *places {
-		if (*places)[i].Name == record[0] {
-			(*places)[i].PlaceInfo = record[1]
-		}
+	if p := getPlaceByName(record[0], places); p != nil {
+		p.PlaceInfo = record[1]
 	}
 }
 
 func applyFlagSimilarity(count int, record []string, places *[]entities.Place) {
-	for i := range *places {
-		if (*places)[i].Name == record[0] {
-			(*places)[i].FlagInfo = record[1]
-		}
+	if p := getPlaceByName(record[0], places); p != nil {
+		p.FlagInfo = record[1]
 	}
 }
 
