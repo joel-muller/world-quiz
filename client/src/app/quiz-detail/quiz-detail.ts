@@ -2,6 +2,7 @@ import { Component, EventEmitter, HostListener, Input, Output } from '@angular/c
 import { QuizService } from '../quiz-service';
 import { Quiz } from '../entities/Quiz';
 import { Card } from '../entities/Card';
+import { GameStats } from '../entities/GameStats';
 
 @Component({
   selector: 'app-quiz-detail',
@@ -13,6 +14,7 @@ export class QuizDetail {
   @Input({ required: true }) quiz!: Quiz;
   @Output() quizFinished = new EventEmitter<void>();
   cards: Card[] = [];
+  stats: GameStats | null = null;
   showBack: boolean = false;
 
   constructor(private quizService: QuizService) {}
@@ -63,6 +65,10 @@ export class QuizDetail {
       this.cards.push(front);
     }
     this.showBack = false;
+
+    if (!this.isActive() && this.stats == null) {
+      this.finishQuizAndLoadStats();
+    }
   }
 
   finishQuiz(): void {
@@ -79,5 +85,17 @@ export class QuizDetail {
       event.preventDefault();
       this.guess(false);
     }
+  }
+
+  private finishQuizAndLoadStats(): void {
+    this.quizService.finishGame(this.quiz.Id).subscribe({
+      next: (stats) => {
+        this.stats = stats;
+        console.log('Quiz finished, stats:', stats);
+      },
+      error: (err) => {
+        console.error('Failed to finish quiz', err);
+      },
+    });
   }
 }

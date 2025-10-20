@@ -7,7 +7,7 @@ import (
 	"world-quiz/internal/entities"
 )
 
-func Filter(places *[]entities.Place, request entities.GameRequest) []entities.Card {
+func Filter(places *[]entities.Place, request entities.RequestGameStart) []entities.Card {
 	filtered := filterTags(places, request.Tags)
 	cards := filterCategory(&filtered, request.Categories)
 	shuffleCards(&cards)

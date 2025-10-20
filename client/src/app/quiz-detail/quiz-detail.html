@@ -41,6 +41,10 @@
 } @else {
   <div class="quiz-complete">
     <p>🎉 Congratulations, you finished the quiz!</p>
+
+    @if (this.stats) {
+      <p>{{ this.stats.Info }}</p>
+    }
   </div>
 }
 
