@@ -6,7 +6,7 @@ on:
   push:
     # run only against tags
     tags:
-      - "*"
+      - "server/v*"
 
 permissions:
   contents: write
@@ -36,6 +36,7 @@ jobs:
           # 'latest', 'nightly', or a semver
           version: "~> v2"
           args: release --clean
+          working-directory: ./server
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
