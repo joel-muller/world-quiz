@@ -1,0 +1,32 @@
+services:
+  server:
+    build: ./server
+    expose:
+      - "8080"
+    networks:
+      - appnet
+
+  client:
+    build: ./client
+    environment:
+      NODE_ENV: production
+    networks:
+      - appnet
+    depends_on:
+      - server
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared_tunnel
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARED_TUNNEL_TOKEN}
+    restart: always
+    networks:
+      - appnet
+    depends_on:
+      - client
+
+networks:
+  appnet:
+    driver: bridge
