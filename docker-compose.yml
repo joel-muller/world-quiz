@@ -1,8 +1,6 @@
 services:
   server:
     build: ./server
-    expose:
-      - "8080"
     networks:
       - appnet
 
