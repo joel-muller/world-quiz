@@ -1,0 +1,58 @@
+@if (!this.registerView) {
+  <div class="login-container">
+    <fieldset>
+      <legend>Login</legend>
+      @if (this.alert) {
+        <p>{{ this.alert }}</p>
+      }
+      <label for="username">Username:</label>
+      <br />
+      <input type="text" id="username" [(ngModel)]="username" name="username" required />
+      <br />
+      <label for="password">Password:</label>
+      <br />
+      <input type="password" id="password" [(ngModel)]="password" name="password" required />
+      <br />
+      <button (click)="login()">Login</button>
+      <br />
+      <p>Dont have an account?</p>
+      <br />
+      <button (click)="openRegisterView()">Register</button>
+      <br />
+    </fieldset>
+  </div>
+} @else {
+  <div class="register-container">
+    <fieldset>
+      <legend>Register</legend>
+      @if (this.alert) {
+        <p>{{ this.alert }}</p>
+      }
+      <label for="reg-username">Username:</label>
+      <br />
+      <input
+        type="text"
+        id="reg-username"
+        [(ngModel)]="usernameRegister"
+        name="username"
+        required
+      />
+      <br />
+      <label for="reg-password">Password:</label>
+      <br />
+      <input
+        type="password"
+        id="reg-password"
+        [(ngModel)]="passwordRegister"
+        name="password"
+        required
+      />
+      <br />
+      <button (click)="register()">Register</button>
+      <br />
+      <p>Registration successfully?</p>
+      <br />
+      <button (click)="closerRegisterView()">Login</button>
+    </fieldset>
+  </div>
+}
