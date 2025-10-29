@@ -20,7 +20,7 @@ export class QuizDetail {
   constructor(private quizService: QuizService) {}
 
   ngOnInit() {
-    this.cards = this.quiz.Cards;
+    this.cards = this.quiz.cards;
   }
 
   getTextCardFlipper() {
@@ -28,7 +28,7 @@ export class QuizDetail {
   }
 
   getCurrentCategory(): number {
-    return this.isActive() ? this.cards[0].Category : -1;
+    return this.isActive() ? this.cards[0].category : -1;
   }
 
   isActive(): boolean {
@@ -36,19 +36,19 @@ export class QuizDetail {
   }
 
   getCurrentFront(): string {
-    return this.isActive() ? this.cards[0].Front : '';
+    return this.isActive() ? this.cards[0].front : '';
   }
 
   getCurrentInfoFront(): string {
-    return this.isActive() ? this.cards[0].InfoFront : '';
+    return this.isActive() ? this.cards[0].frontInfo : '';
   }
 
   getCurrentBack(): string {
-    return this.isActive() ? this.cards[0].Back : '';
+    return this.isActive() ? this.cards[0].back : '';
   }
 
   getCurrentInfoBack(): string {
-    return this.isActive() ? this.cards[0].InfoBack : '';
+    return this.isActive() ? this.cards[0].backInfo : '';
   }
 
   toggleBack(): void {
@@ -88,7 +88,7 @@ export class QuizDetail {
   }
 
   private finishQuizAndLoadStats(): void {
-    this.quizService.finishGame(this.quiz.Id).subscribe({
+    this.quizService.finishGame(this.quiz.id).subscribe({
       next: (stats) => {
         this.stats = stats;
         console.log('Quiz finished, stats:', stats);

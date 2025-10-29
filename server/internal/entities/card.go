@@ -1,10 +1,10 @@
 package entities
 
 type Card struct {
-	PlaceId   int
-	Category  Category
-	Front     string
-	InfoFront string
-	Back      string
-	InfoBack  string
+	PlaceId   int      `json:"placeId"`
+	Category  Category `json:"category"`
+	Front     string   `json:"front"`
+	InfoFront string   `json:"frontInfo"`
+	Back      string   `json:"back"`
+	InfoBack  string   `json:"backInfo"`
 }

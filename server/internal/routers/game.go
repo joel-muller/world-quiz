@@ -6,11 +6,11 @@ import (
 )
 
 func GameRouter(manager *game.Manager) {
-	handlePost("/game", func(req entities.RequestGameStart) (entities.Game, error) {
+	handlePost("/game", func(req entities.RequestGame) (entities.Game, error) {
 		return manager.CreateGame(req)
 	})
 
-	handlePost("/game/finish", func(req entities.RequestGameFinish) (entities.GameStats, error) {
+	handlePost("/game/finish", func(req entities.RequestGameStats) (entities.GameStats, error) {
 		return manager.FinishGame(req)
 	})
 }

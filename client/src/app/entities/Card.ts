@@ -1,8 +1,8 @@
 export interface Card {
-  PlaceId: number;
-  Category: number;
-  Front: string;
-  InfoFront: string;
-  Back: string;
-  InfoBack: string;
+  placeId: number;
+  category: number;
+  front: string;
+  frontInfo: string;
+  back: string;
+  backInfo: string;
 }

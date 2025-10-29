@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"world-quiz/internal/config"
+	"world-quiz/internal/entities"
 )
 
 func setCORSHeaders(w http.ResponseWriter) {
@@ -52,14 +53,14 @@ func extractUsernameFromJWT(r *http.Request) (string, error) {
 
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 	cfg := config.GetConfig()
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (any, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &entities.Claims{}, func(token *jwt.Token) (any, error) {
 		return []byte(cfg.JWTSecret), nil
 	})
 	if err != nil || !token.Valid {
 		return "", errors.New("invalid or expired token")
 	}
 
-	claims, ok := token.Claims.(*Claims)
+	claims, ok := token.Claims.(*entities.Claims)
 	if !ok {
 		return "", errors.New("invalid token claims")
 	}

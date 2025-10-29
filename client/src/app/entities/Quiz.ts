@@ -1,6 +1,6 @@
 import { Card } from './Card';
 
 export interface Quiz {
-  Id: string;
-  Cards: Card[];
+  id: string;
+  cards: Card[];
 }

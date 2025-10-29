@@ -84,7 +84,7 @@ export class QuizManager {
     this.quizService.fetchQuiz(categoryArray, tagsArray, this.maxCards).subscribe({
       next: (data) => {
         this.quiz = data;
-        if (data.Cards.length === 0) {
+        if (data.cards.length === 0) {
           this.currentError = 'Ups, it seems that there are no cards with that selection';
         } else {
           this.active = true;

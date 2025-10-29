@@ -1,4 +1,4 @@
 export interface GameStats {
-  Id: string;
-  Info: string;
+  id: string;
+  info: string;
 }
