@@ -19,33 +19,33 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ch.hslu</groupId>
-    <artifactId>oop_maven_template</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <groupId>com.worldquiz</groupId>
+    <artifactId>world-quiz</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>oop_maven_template</name>
+    <name>world-quiz-server</name>
     <description>
-        Projekt-Template für Java-Projekte an der HSLU. Details siehe unter Beschreibung.
+        Server for the World Quiz Application
     </description>
-    <url>https://hslu-i1.gitlab.io/oop/${project.artifactId}</url>
+    <url>https://github.com/joel-muller/${project.artifactId}</url>
 
     <organization>
-        <name>Hochschule Luzern - Informatik</name>
-        <url>https://www.hslu.ch/informatik/</url>
+        <name>Joel Muller</name>
+        <url>https://github.com/joel-muller</url>
     </organization>
 
     <licenses>
         <license>
-            <name>Apache License, Version 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
         </license>
     </licenses>
 
     <developers>
         <developer>
             <id>${scm.developer.uid}</id>
-            <name>Name Vorname</name>
+            <name>Joel Muller</name>
             <email>vorname.name@stud.hslu.ch</email>
             <organization>HSLU Informatik</organization>
             <roles>
@@ -76,7 +76,7 @@
         <argLine>-Xms512m -Xmx1g -Xss10m</argLine>
 
         <!-- Hier ggf. andere Startklasse anpassen! -->
-        <jar.start.class>ch.hslu.demo.DemoApp</jar.start.class>
+        <jar.start.class>com.worldquiz.Application</jar.start.class>
 
         <!-- Folgende Werte für SCM/User/Deployment/Docker anpassen! -->
         <scm.group.name>hslu/edu/bachelor-computer-science/somewhere</scm.group.name>
@@ -125,6 +125,7 @@
         <junit.version>6.0.0</junit.version>
 
         <openjfx.version>21.0.8</openjfx.version>
+        <springboot.version>3.5.10</springboot.version>
     </properties>
 
     <dependencyManagement>
@@ -196,6 +197,17 @@
                 <version>1.0.4</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${springboot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${springboot.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -227,6 +239,14 @@
         <dependency>
             <groupId>io.github.hakky54</groupId>
             <artifactId>consolecaptor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
     </dependencies>
 
@@ -432,6 +452,11 @@
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
                     <version>5.2.0.4988</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${springboot.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -806,6 +831,10 @@
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
