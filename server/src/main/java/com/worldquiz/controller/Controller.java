@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/quiz")
 public class Controller {
     private final GameManager manager;
@@ -28,7 +29,7 @@ public class Controller {
     @PostMapping
     public ResponseEntity<Game> createGame(@RequestBody RequestGame request) {
         int numberOfCards = request.number() != null ? request.number() : 1000000;
-        Game game = manager.createGame(request.category(), request.tags(), numberOfCards);
+        Game game = manager.createGame(request.categories(), request.tags(), numberOfCards);
         return ResponseEntity.ok(game);
     }
 

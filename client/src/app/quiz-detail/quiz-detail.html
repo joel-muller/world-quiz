@@ -1,32 +1,36 @@
-@if (isActive()) {
+@if (this.currentCard) {
   <div class="quiz-card">
-    @switch (getCurrentCategory()) {
-      @case (0) {
-        <img class="quiz-image" [src]="'/media/maps/' + getCurrentFront()" alt="Map" />
+    @switch (currentCard.category) {
+      @case (Category.MAP_NAME) {
+        <img class="quiz-image" [src]="'/media/maps/' + currentCard.front" alt="Map" />
       }
-      @case (1) {
-        <img class="quiz-image" [src]="'/media/flags/' + getCurrentFront()" alt="Flag" />
+      @case (Category.FLAG_NAME) {
+        <img class="quiz-image" [src]="'/media/flags/' + currentCard.front" alt="Flag" />
       }
-      @case (2) {
+      @case (Category.CAPITAL_NAME) {
         <p class="quiz-question">
-          In which place is the Capital <strong>{{ getCurrentFront() }}</strong
+          In which place is the Capital <strong>{{ currentCard.front }}</strong
           >?
         </p>
       }
       @default {
         <p class="quiz-question">
-          Guess the Capital of <strong>{{ getCurrentFront() }}</strong>
+          Guess the Capital of <strong>{{ currentCard.front }}</strong>
         </p>
       }
     }
-    <p class="quiz-info">{{ getCurrentInfoFront() }}</p>
+    @if (currentCard.frontInfo) {
+      <p class="quiz-info">{{ currentCard.frontInfo }}</p>
+    }
 
     <hr />
 
     @if (showBack) {
       <div class="quiz-back">
-        <p>{{ getCurrentBack() }}</p>
-        <p class="quiz-info">{{ getCurrentInfoBack() }}</p>
+        <p>{{ currentCard.back }}</p>
+        @if (currentCard.backInfo) {
+          <p class="quiz-info">{{ currentCard.backInfo }}</p>
+        }
       </div>
     }
 

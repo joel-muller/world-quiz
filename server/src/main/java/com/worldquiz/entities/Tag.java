@@ -1,4 +1,7 @@
+/* (C)2026 */
 package com.worldquiz.entities;
+
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Tag {
     EUROPE,
@@ -15,5 +18,10 @@ public enum Tag {
     MIDDLE_EAST,
     EAST_AFRICA,
     SOUTHEAST_ASIA,
-    CARIBBEAN,
+    CARIBBEAN;
+
+    @JsonValue
+    public int toValue() {
+        return this.ordinal();
+    }
 }

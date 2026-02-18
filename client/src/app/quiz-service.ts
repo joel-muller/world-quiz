@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { Quiz } from './entities/Quiz';
 import { GameStats } from './entities/GameStats';
 import { environment } from '../environments/environment';
+import { Category } from './entities/Category';
+import { Tag } from './entities/Tag';
 
 @Injectable({
   providedIn: 'root',
@@ -11,8 +13,8 @@ import { environment } from '../environments/environment';
 export class QuizService {
   constructor(private http: HttpClient) {}
 
-  fetchQuiz(categories: number[], tags: number[], number: number | undefined): Observable<Quiz> {
-    const url = `${environment.apiUrl}/game`;
+  fetchQuiz(categories: Category[], tags: Tag[], number: number | undefined): Observable<Quiz> {
+    const url = `${environment.apiUrl}/quiz`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     if (number) {
       const body = { categories, tags, number };
@@ -23,9 +25,7 @@ export class QuizService {
   }
 
   finishGame(gameId: string): Observable<GameStats> {
-    const url = `${environment.apiUrl}/game/finish`;
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const body = { id: gameId };
-    return this.http.post<GameStats>(url, body, { headers });
+    const url = `${environment.apiUrl}/quiz/${gameId}/finish`;
+    return this.http.post<GameStats>(url, {});
   }
 }

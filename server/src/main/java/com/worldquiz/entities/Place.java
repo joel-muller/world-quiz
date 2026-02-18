@@ -14,11 +14,8 @@ public record Place(
         String flag,
         String flagInfo,
         List<Tag> tags) {
-    public Place(int id, String name) {
-        this(id, name, null, null, null, null, null, null, null, List.of());
-    }
 
     public String nameWithCapital() {
-        return this.capital() != null ? this.name() + " (" + this.capital() + ") " : this.name();
+        return this.capital() != null ? this.name() + " (" + this.capital() + ")" : this.name();
     }
 }

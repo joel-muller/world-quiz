@@ -3,7 +3,7 @@
 curl -X POST http://localhost:8080/quiz \
   -H "Content-Type: application/json" \
   -d '{
-    "category": "CAPITAL_NAME",
-    "tags": ["EUROPE", "NORTH_AMERICA"],
+    "categories": [1, 2],
+    "tags": [3, 4],
     "number": 10
   }'

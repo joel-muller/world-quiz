@@ -3,6 +3,7 @@ import { QuizService } from '../quiz-service';
 import { Quiz } from '../entities/Quiz';
 import { Card } from '../entities/Card';
 import { GameStats } from '../entities/GameStats';
+import { Category } from '../entities/Category';
 
 @Component({
   selector: 'app-quiz-detail',
@@ -14,6 +15,7 @@ export class QuizDetail {
   @Input({ required: true }) quiz!: Quiz;
   @Output() quizFinished = new EventEmitter<void>();
   cards: Card[] = [];
+  currentCard: Card | null = null;
   stats: GameStats | null = null;
   showBack: boolean = false;
 
@@ -21,38 +23,23 @@ export class QuizDetail {
 
   ngOnInit() {
     this.cards = this.quiz.cards;
+    this.loadCard()
   }
 
   getTextCardFlipper() {
     return this.showBack ? 'Show Back' : 'Hide Back';
   }
 
-  getCurrentCategory(): number {
-    return this.isActive() ? this.cards[0].category : -1;
-  }
-
-  isActive(): boolean {
-    return this.cards.length > 0;
-  }
-
-  getCurrentFront(): string {
-    return this.isActive() ? this.cards[0].front : '';
-  }
-
-  getCurrentInfoFront(): string {
-    return this.isActive() ? this.cards[0].frontInfo : '';
-  }
-
-  getCurrentBack(): string {
-    return this.isActive() ? this.cards[0].back : '';
-  }
-
-  getCurrentInfoBack(): string {
-    return this.isActive() ? this.cards[0].backInfo : '';
-  }
-
   toggleBack(): void {
     this.showBack = !this.showBack;
+  }
+
+  loadCard() {
+      if (this.cards.length > 0) {
+        this.currentCard = this.cards[0];
+      } else {
+        this.currentCard = null;
+      }
   }
 
   guess(right: boolean): void {
@@ -65,8 +52,9 @@ export class QuizDetail {
       this.cards.push(front);
     }
     this.showBack = false;
+    this.loadCard()
 
-    if (!this.isActive() && this.stats == null) {
+    if (this.currentCard == null) {
       this.finishQuizAndLoadStats();
     }
   }
@@ -98,4 +86,6 @@ export class QuizDetail {
       },
     });
   }
+
+  protected readonly Category = Category;
 }

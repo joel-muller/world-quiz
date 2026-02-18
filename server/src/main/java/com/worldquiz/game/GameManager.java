@@ -13,8 +13,8 @@ public class GameManager {
         this.games = new HashMap<>();
     }
 
-    public Game createGame(Category category, List<Tag> tags, int maxNumberOfCards) {
-        List<Card> cards = cardManager.getCards(maxNumberOfCards, category, Set.copyOf(tags));
+    public Game createGame(List<Category> categories, List<Tag> tags, int maxNumberOfCards) {
+        List<Card> cards = cardManager.getCards(maxNumberOfCards, categories, Set.copyOf(tags));
         Game game = new Game(UUID.randomUUID(), cards);
         games.put(game.id(), game);
         return game;
