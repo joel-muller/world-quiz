@@ -23,7 +23,7 @@ export class QuizDetail {
 
   ngOnInit() {
     this.cards = this.quiz.cards;
-    this.loadCard()
+    this.loadCard();
   }
 
   getTextCardFlipper() {
@@ -35,11 +35,11 @@ export class QuizDetail {
   }
 
   loadCard() {
-      if (this.cards.length > 0) {
-        this.currentCard = this.cards[0];
-      } else {
-        this.currentCard = null;
-      }
+    if (this.cards.length > 0) {
+      this.currentCard = this.cards[0];
+    } else {
+      this.currentCard = null;
+    }
   }
 
   guess(right: boolean): void {
@@ -52,7 +52,7 @@ export class QuizDetail {
       this.cards.push(front);
     }
     this.showBack = false;
-    this.loadCard()
+    this.loadCard();
 
     if (this.currentCard == null) {
       this.finishQuizAndLoadStats();
