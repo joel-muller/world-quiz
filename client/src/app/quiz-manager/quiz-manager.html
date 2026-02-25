@@ -1,44 +1,38 @@
 @if (this.active && quiz) {
   <app-quiz-detail [quiz]="quiz" (quizFinished)="onQuizFinished()" />
 } @else {
-  <h2>Start a Quiz</h2>
-  <fieldset>
-    <legend>Select Tags:</legend>
-    @for (tag of tagOptions; track tag.value) {
-      <label>
-        <input
-          type="checkbox"
-          [value]="this.selectedTags.has(tag.value)"
-          (change)="toggleTag(tag.value)"
-        />
-        {{ tag.name }}
-        <br />
-      </label>
-    } @empty {
-      <span>No tags available</span>
-    }
-    <legend>Max Cards:</legend>
-    <input type="number" [(ngModel)]="maxCards" placeholder="Enter max cards" />
-    <legend>Select Front and Back:</legend>
+  <div class="select-header">
+    <div>
+      <h2>Categories</h2>
+    </div>
+    <div>
+      <button (click)="setAllTags(true)"><i class="fa-solid fa-check-double"></i></button>
+      <button (click)="setAllTags(false)"><i class="fa-solid fa-broom"></i></button>
+    </div>
+  </div>
+  @for (tag of tagOptions; track tag.value) {
+    <button (click)="toggleTag(tag.value)" [class.selected]="tag.selected">{{ tag.name }}</button>
+  } @empty {
+    <span>No tags available</span>
+  }
 
-    <legend>Select Category:</legend>
-    @for (cat of categoryOptions; track cat.value) {
-      <label>
-        <input
-          type="checkbox"
-          [value]="selectedCategories.has(cat.value)"
-          (change)="toggleCategory(cat.value)"
-        />
-        {{ cat.name }}
-        <br />
-      </label>
-    } @empty {
-      <span>No tags available</span>
-    }
-
-    @if (currentError) {
-      <p>{{ currentError }}</p>
-    }
-    <button (click)="fetchQuiz()">Start quiz</button>
-  </fieldset>
+  <div class="select-header">
+    <div>
+      <h2>Card Types</h2>
+    </div>
+    <div>
+      <button (click)="setAllCategories(true)"><i class="fa-solid fa-check-double"></i></button>
+      <button (click)="setAllCategories(false)"><i class="fa-solid fa-broom"></i></button>
+    </div>
+  </div>
+  @for (cat of categoryOptions; track cat.value) {
+    <button (click)="toggleCategory(cat.value)" [class.selected]="cat.selected">
+      {{ cat.name }}
+    </button>
+  } @empty {
+    <span>No tags available</span>
+  }
+  <h2>Start</h2>
+  <input type="number" [(ngModel)]="maxCards" placeholder="Enter max cards" />
+  <button [disabled]="!quizReady()" (click)="fetchQuiz()">Start quiz</button>
 }

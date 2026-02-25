@@ -27,7 +27,7 @@ export class QuizDetail {
   }
 
   getTextCardFlipper() {
-    return this.showBack ? 'Show Back' : 'Hide Back';
+    return this.showBack ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
   }
 
   toggleBack(): void {
@@ -55,11 +55,16 @@ export class QuizDetail {
     this.loadCard();
 
     if (this.currentCard == null) {
-      this.finishQuizAndLoadStats();
+      this.getStats();
     }
   }
 
-  finishQuiz(): void {
+  abortQuiz(): void {
+    this.currentCard = null;
+    this.getStats();
+  }
+
+  closeQuiz(): void {
     this.quizFinished.emit();
   }
 
@@ -75,7 +80,7 @@ export class QuizDetail {
     }
   }
 
-  private finishQuizAndLoadStats(): void {
+  private getStats(): void {
     this.quizService.finishGame(this.quiz.id).subscribe({
       next: (stats) => {
         this.stats = stats;

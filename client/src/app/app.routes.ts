@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Dashboard } from './dashboard/dashboard';
 import { QuizManager } from './quiz-manager/quiz-manager';
+import { Account } from './account/account';
 
 export const routes: Routes = [
   {
@@ -16,6 +17,11 @@ export const routes: Routes = [
   {
     path: 'quiz',
     component: QuizManager,
-    title: 'Image Uploader',
+    title: 'Quiz',
+  },
+  {
+    path: 'account',
+    component: Account,
+    title: 'Account',
   },
 ];

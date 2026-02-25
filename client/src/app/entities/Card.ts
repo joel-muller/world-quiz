@@ -4,7 +4,7 @@ export interface Card {
   placeId: number;
   category: Category;
   front: string;
-  frontInfo: string;
+  infoFront: string;
   back: string;
-  backInfo: string;
+  infoBack: string;
 }

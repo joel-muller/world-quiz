@@ -1,58 +1,70 @@
 @if (this.currentCard) {
-  <div class="quiz-card">
-    @switch (currentCard.category) {
-      @case (Category.MAP_NAME) {
-        <img class="quiz-image" [src]="'/media/maps/' + currentCard.front" alt="Map" />
-      }
-      @case (Category.FLAG_NAME) {
-        <img class="quiz-image" [src]="'/media/flags/' + currentCard.front" alt="Flag" />
-      }
-      @case (Category.CAPITAL_NAME) {
-        <p class="quiz-question">
-          In which place is the Capital <strong>{{ currentCard.front }}</strong
-          >?
-        </p>
-      }
-      @default {
-        <p class="quiz-question">
-          Guess the Capital of <strong>{{ currentCard.front }}</strong>
-        </p>
-      }
-    }
-    @if (currentCard.frontInfo) {
-      <p class="quiz-info">{{ currentCard.frontInfo }}</p>
-    }
-
-    <hr />
-
-    @if (showBack) {
-      <div class="quiz-back">
-        <p>{{ currentCard.back }}</p>
-        @if (currentCard.backInfo) {
-          <p class="quiz-info">{{ currentCard.backInfo }}</p>
+  <div class="card">
+    <div>
+      @switch (currentCard.category) {
+        @case (Category.MAP_NAME) {
+          <img class="quiz-image" [src]="'/media/maps/' + currentCard.front" alt="Map" />
         }
-      </div>
-    }
+        @case (Category.FLAG_NAME) {
+          <img class="quiz-image" [src]="'/media/flags/' + currentCard.front" alt="Flag" />
+        }
+        @case (Category.CAPITAL_NAME) {
+          <p class="quiz-question">
+            Where the Capital is <strong>{{ currentCard.front }}</strong
+            >?
+          </p>
+        }
+        @default {
+          <p class="quiz-question">
+            Capital of <strong>{{ currentCard.front }}</strong>
+          </p>
+        }
+      }
 
-    <div class="quiz-actions">
+      @if (currentCard.infoFront) {
+        <div class="quiz-info">
+          <div>
+            <i class="fa-solid fa-circle-info fa-2x"></i>
+          </div>
+          <div>
+            <p>{{ currentCard.infoFront }}</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div>
+      <hr />
+
+      @if (showBack) {
+        <p class="quiz-answer">{{ currentCard.back }}</p>
+        @if (currentCard.infoBack) {
+          <div class="quiz-info">
+            <div>
+              <i class="fa-solid fa-circle-info fa-2x"></i>
+            </div>
+            <div>
+              <p>{{ currentCard.infoBack }}</p>
+            </div>
+          </div>
+        }
+      }
+
       <button class="btn" (click)="toggleBack()">
-        {{ getTextCardFlipper() }}
+        <i [class]="getTextCardFlipper()"></i>
       </button>
-      <button class="btn btn-success" (click)="guess(true)">Guessed Right</button>
-      <button class="btn btn-danger" (click)="guess(false)">Guessed Wrong</button>
+      <button class="btn btn-success" (click)="guess(true)">
+        <i class="fa-solid fa-check"></i>
+      </button>
+      <button class="btn btn-danger" (click)="guess(false)"><i class="fa-solid fa-x"></i></button>
+      <button class="btn btn-secondary" (click)="abortQuiz()">Abort Quiz</button>
     </div>
   </div>
 } @else {
-  <div class="quiz-complete">
-    <p>🎉 Congratulations, you finished the quiz!</p>
+  <p>🎉 Congratulations, you finished the quiz!</p>
 
-    @if (this.stats) {
-      <p>{{ this.stats.info }}</p>
-    }
-  </div>
+  @if (this.stats) {
+    <p>{{ this.stats.info }}</p>
+  }
+  <button class="btn btn-secondary" (click)="closeQuiz()">Close</button>
 }
-
-<div class="quiz-footer">
-  <p>{{ cards.length }} cards left</p>
-  <button class="btn btn-secondary" (click)="finishQuiz()">Finish Quiz</button>
-</div>

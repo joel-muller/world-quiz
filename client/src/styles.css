@@ -1,1 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
+@import 'water.css/out/water.css';
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+:root {
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-body: #0e0e0e;
+  }
+}

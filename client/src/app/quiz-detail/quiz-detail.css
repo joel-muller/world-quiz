@@ -1,0 +1,30 @@
+img {
+  border-radius: 12px;
+}
+
+.quiz-question {
+  font-size: 1.5rem;
+  font-weight: 300;
+}
+
+.quiz-answer {
+  font-size: 1.5rem;
+  font-weight: 300;
+}
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  height: 80dvh;
+}
+
+.quiz-info {
+  padding: 1rem;
+  gap: 1rem;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  background-color: grey;
+  margin: 1rem 0;
+}
