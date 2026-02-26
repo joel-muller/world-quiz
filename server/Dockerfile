@@ -14,11 +14,12 @@
 # limitations under the License.
 #
 FROM amazoncorretto:21-alpine
-LABEL maintainer="Roland Gisler <roland.gisler@hslu.ch>, HSLU Informatik"
+LABEL maintainer="Joel Muller"
 LABEL version="1.0.0"
-LABEL description="Simple Java project template with CI/CD."
+LABEL description="Server side for the World Quiz Application"
 RUN adduser -D worker
 USER worker
-WORKDIR /opt/demo
-CMD ["java","-jar","/opt/demo/oop_maven_template.jar"]
-COPY target/oop_maven_template.jar /opt/demo/oop_maven_template.jar
+WORKDIR /opt/world-quiz
+CMD ["java","-jar","world-quiz.jar"]
+COPY target/world-quiz.jar /opt/world-quiz/world-quiz.jar
+COPY data data
