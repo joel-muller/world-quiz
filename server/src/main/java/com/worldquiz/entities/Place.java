@@ -2,7 +2,9 @@
 package com.worldquiz.entities;
 
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public record Place(
         int id,
         String name,
@@ -14,6 +16,8 @@ public record Place(
         String flag,
         String flagInfo,
         List<Tag> tags) {
+
+    public static class PlaceBuilder {}
 
     public String nameWithCapital() {
         return this.capital() != null ? this.name() + " (" + this.capital() + ")" : this.name();
