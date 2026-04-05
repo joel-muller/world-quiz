@@ -5,23 +5,38 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import com.worldquiz.entities.Place;
 import com.worldquiz.entities.Tag;
+import jakarta.annotation.PostConstruct;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 public class PlaceReader {
     private final String baseDir;
     private final int firstId;
 
-    public PlaceReader(String baseDir, int firstId) {
+    public PlaceReader(
+            @Value("${place.csv.base-dir}") String baseDir,
+            @Value("${place.csv.first-id}") int firstId) {
         this.baseDir = baseDir;
         this.firstId = firstId;
+    }
+
+    @Getter private List<Place> places;
+
+    @PostConstruct
+    public void init() {
+        log.info("Loading places from CSVs...");
+        places = read();
+        log.info("Loaded {} places", places.size());
     }
 
     public List<Place> read() {
@@ -36,7 +51,7 @@ public class PlaceReader {
         return builders.values().stream().map(Place.PlaceBuilder::build).toList();
     }
 
-    private List<String[]> readCsv(String fileName) {
+    List<String[]> readCsv(String fileName) {
         List<String[]> lines = new ArrayList<>();
         try (CSVReader reader = new CSVReader(new FileReader(this.baseDir + "/" + fileName))) {
             String[] nextLine;
@@ -53,7 +68,7 @@ public class PlaceReader {
         return lines;
     }
 
-    private Map<String, Place.PlaceBuilder> readMain(List<String[]> lines) {
+    Map<String, Place.PlaceBuilder> readMain(List<String[]> lines) {
         Map<String, Place.PlaceBuilder> builders = new HashMap<>();
         for (int i = 0; i < lines.size(); i++) {
             String[] line = lines.get(i);
@@ -74,7 +89,7 @@ public class PlaceReader {
         return builders;
     }
 
-    private void updatePlaceBuilder(
+    void updatePlaceBuilder(
             List<String[]> lines,
             Map<String, Place.PlaceBuilder> builders,
             BiConsumer<Place.PlaceBuilder, String> setter) {
@@ -86,7 +101,7 @@ public class PlaceReader {
         }
     }
 
-    private String getFlagOrMap(String input) {
+    String getFlagOrMap(String input) {
         Pattern p = Pattern.compile("\"(.*?)\"");
         Matcher m = p.matcher(input);
         if (m.find()) {
@@ -95,7 +110,7 @@ public class PlaceReader {
         return null;
     }
 
-    private List<Tag> getTags(String input) {
+    List<Tag> getTags(String input) {
         Map<String, Tag> tagsName =
                 Map.ofEntries(
                         Map.entry("Europe", Tag.EUROPE),
@@ -114,13 +129,5 @@ public class PlaceReader {
                         Map.entry("Southeast_Asia", Tag.SOUTHEAST_ASIA),
                         Map.entry("Caribbean", Tag.CARIBBEAN));
         return tagsName.keySet().stream().filter(input::contains).map(tagsName::get).toList();
-    }
-
-    public static void main(String[] args) {
-        PlaceReader reader = new PlaceReader("data", 10000);
-        List<Place> places = reader.read();
-        for (Place place : places) {
-            System.out.println(place.capital());
-        }
     }
 }

@@ -1,19 +1,20 @@
 /* (C)2026 */
-package com.worldquiz.game;
+package com.worldquiz.service;
 
 import com.worldquiz.entities.Card;
 import com.worldquiz.entities.Category;
 import com.worldquiz.entities.Place;
 import com.worldquiz.entities.Tag;
+import com.worldquiz.reader.PlaceReader;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-public class CardManager {
-    private final List<Place> places;
-
-    public CardManager(List<Place> places) {
-        this.places = places;
-    }
+@Service
+@RequiredArgsConstructor
+public class CardService {
+    private final PlaceReader placeReader;
 
     public List<Card> getCards(int numberOfCards, List<Category> categories, Set<Tag> tags) {
         Objects.requireNonNull(categories);
@@ -24,7 +25,7 @@ public class CardManager {
                         categories.stream()
                                 .flatMap(
                                         category ->
-                                                this.places.stream()
+                                                this.placeReader.getPlaces().stream()
                                                         .filter(
                                                                 place ->
                                                                         isCategory(place, category)

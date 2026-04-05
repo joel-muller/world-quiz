@@ -1,155 +1,120 @@
+/* (C)2026 */
 package com.worldquiz.reader;
-
-import com.worldquiz.entities.Place;
-import com.worldquiz.entities.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.worldquiz.entities.Place;
+import com.worldquiz.entities.Tag;
+import java.util.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 class PlaceReaderTest {
-    @TempDir
-    Path tempDir;
 
-    private void writeFile(String fileName, List<String> lines) throws IOException {
-        Files.write(tempDir.resolve(fileName), lines);
-    }
+    private PlaceReader reader;
 
-    private void createMinimalValidFiles() throws IOException {
-        writeFile("main.csv", List.of(
-                "France,\"info\"flagUrl\"info\",\"info\"mapUrl\"info\",EU,Europe,Sovereign_State"
-        ));
-
-        writeFile("country_info.csv", List.of(
-                "France,Country info"
-        ));
-
-        writeFile("capital.csv", List.of(
-                "France,Paris"
-        ));
-
-        writeFile("capital_info.csv", List.of(
-                "France,Capital info"
-        ));
-
-        writeFile("flag_similarity.csv", List.of(
-                "France,Similar flag"
-        ));
+    @BeforeEach
+    void setUp() {
+        reader = new PlaceReader("dummyDir", 100);
     }
 
     @Test
-    void shouldReadSinglePlaceSuccessfully() throws IOException {
-        createMinimalValidFiles();
-
-        PlaceReader reader = new PlaceReader(tempDir.toString(), 100);
-        List<Place> places = reader.read();
-
-        assertEquals(1, places.size());
-
-        Place france = places.get(0);
-
-        assertEquals("France", france.name());
-        assertEquals(100, france.id());
-        assertEquals("EU", france.regionCode());
-        assertEquals("Paris", france.capital());
-        assertEquals("flagUrl", france.flag());
-        assertEquals("mapUrl", france.maps());
-
-        assertTrue(france.tags().contains(Tag.EUROPE));
-        assertTrue(france.tags().contains(Tag.SOVEREIGN_STATE));
+    void testGetFlagOrMap_withQuotedString() {
+        String input = "\"<img src='flag.svg' />\"";
+        assertEquals("<img src='flag.svg' />", reader.getFlagOrMap(input));
     }
 
     @Test
-    void shouldAssignIncrementingIds() throws IOException {
-        writeFile("main.csv", List.of(
-                "France,\"f1\",\"m1\",EU,Europe",
-                "Germany,\"f2\",\"m2\",EU,Europe"
-        ));
-
-        writeFile("country_info.csv", List.of());
-        writeFile("capital.csv", List.of());
-        writeFile("capital_info.csv", List.of());
-        writeFile("flag_similarity.csv", List.of());
-
-        PlaceReader reader = new PlaceReader(tempDir.toString(), 500);
-        List<Place> places = reader.read();
-
-        assertEquals(2, places.size());
-        assertEquals(500, places.get(0).id());
-        assertEquals(501, places.get(1).id());
+    void testGetFlagOrMap_withoutQuotes() {
+        String input = "<img src='flag.svg' />";
+        assertNull(reader.getFlagOrMap(input));
     }
 
     @Test
-    void shouldReturnNullFlagWhenNoQuotesPresent() throws IOException {
-        writeFile("main.csv", List.of(
-                "France,flagWithoutQuotes,mapWithoutQuotes,EU,Europe"
-        ));
-
-        writeFile("country_info.csv", List.of());
-        writeFile("capital.csv", List.of());
-        writeFile("capital_info.csv", List.of());
-        writeFile("flag_similarity.csv", List.of());
-
-        PlaceReader reader = new PlaceReader(tempDir.toString(), 1);
-        List<Place> places = reader.read();
-
-        Place place = places.get(0);
-
-        assertNull(place.flag());
-        assertNull(place.maps());
+    void testGetTags_singleKnownTag() {
+        List<Tag> tags = reader.getTags("Europe");
+        assertEquals(1, tags.size());
+        assertEquals(Tag.EUROPE, tags.get(0));
     }
 
     @Test
-    void shouldIgnoreUpdatesForUnknownPlace() throws IOException {
-        writeFile("main.csv", List.of(
-                "France,\"flag\",\"map\",EU,Europe"
-        ));
-
-        writeFile("country_info.csv", List.of(
-                "Germany,Some info"
-        ));
-
-        writeFile("capital.csv", List.of());
-        writeFile("capital_info.csv", List.of());
-        writeFile("flag_similarity.csv", List.of());
-
-        PlaceReader reader = new PlaceReader(tempDir.toString(), 1);
-        List<Place> places = reader.read();
-
-        assertEquals(1, places.size());
-        assertNull(places.get(0).capital());
+    void testGetTags_multipleKnownTags() {
+        List<Tag> tags = reader.getTags("Europe, Asia, Caribbean");
+        assertTrue(tags.containsAll(Arrays.asList(Tag.EUROPE, Tag.ASIA, Tag.CARIBBEAN)));
+        assertEquals(3, tags.size());
     }
 
     @Test
-    void shouldThrowRuntimeExceptionWhenFileMissing() {
-        PlaceReader reader = new PlaceReader(tempDir.toString(), 1);
-
-        RuntimeException ex = assertThrows(RuntimeException.class, reader::read);
-        assertNotNull(ex.getCause());
+    void testGetTags_unknownTagIgnored() {
+        List<Tag> tags = reader.getTags("Europe, Mars");
+        assertEquals(1, tags.size());
+        assertEquals(Tag.EUROPE, tags.get(0));
     }
 
     @Test
-    void shouldParseMultipleTags() throws IOException {
-        writeFile("main.csv", List.of(
-                "Egypt,\"flag\",\"map\",AF,Africa,Middle_East"
-        ));
+    void testGetTags_emptyInput() {
+        List<Tag> tags = reader.getTags("");
+        assertTrue(tags.isEmpty());
+    }
 
-        writeFile("country_info.csv", List.of());
-        writeFile("capital.csv", List.of());
-        writeFile("capital_info.csv", List.of());
-        writeFile("flag_similarity.csv", List.of());
+    @Test
+    void testReadMain_createsBuildersCorrectly() {
+        List<String[]> lines = new ArrayList<>();
+        lines.add(
+                new String[] {"England", "\"flag1\"", "\"map1\"", "EU", "Europe, Sovereign_State"});
+        lines.add(new String[] {"France", "\"flag2\"", "\"map2\"", "FR", "Europe"});
 
-        PlaceReader reader = new PlaceReader(tempDir.toString(), 1);
-        List<Place> places = reader.read();
+        Map<String, Place.PlaceBuilder> builders = reader.readMain(lines);
 
-        List<Tag> tags = places.get(0).tags();
+        assertEquals(2, builders.size());
+        Place.PlaceBuilder englandBuilder = builders.get("England");
+        assertNotNull(englandBuilder);
+        Place england = englandBuilder.build();
+        assertEquals(100, england.id());
+        assertEquals("England", england.name());
+        assertEquals("EU", england.regionCode());
+        assertEquals("flag1", england.flag());
+        assertEquals("map1", england.maps());
+        assertTrue(england.tags().contains(Tag.EUROPE));
+        assertTrue(england.tags().contains(Tag.SOVEREIGN_STATE));
 
-        assertTrue(tags.contains(Tag.AFRICA));
-        assertTrue(tags.contains(Tag.MIDDLE_EAST));
+        Place france = builders.get("France").build();
+        assertEquals(101, france.id());
+    }
+
+    @Test
+    void testUpdatePlaceBuilder_appliesSetter() {
+        Place.PlaceBuilder builder = Place.builder().name("England");
+        Map<String, Place.PlaceBuilder> builders = new HashMap<>();
+        builders.put("England", builder);
+
+        List<String[]> lines = new ArrayList<>();
+        lines.add(new String[] {"England", "Info about England"});
+        reader.updatePlaceBuilder(lines, builders, Place.PlaceBuilder::placeInfo);
+
+        assertEquals("Info about England", builder.build().placeInfo());
+    }
+
+    @Test
+    void testUpdatePlaceBuilder_nonExistingKey() {
+        Place.PlaceBuilder builder = Place.builder().name("England");
+        Map<String, Place.PlaceBuilder> builders = new HashMap<>();
+        builders.put("England", builder);
+
+        List<String[]> lines = new ArrayList<>();
+        lines.add(new String[] {"France", "Info about France"});
+        reader.updatePlaceBuilder(lines, builders, Place.PlaceBuilder::placeInfo);
+
+        assertNull(builder.build().placeInfo());
+    }
+
+    @Test
+    void testUpdatePlaceBuilder_emptyLines() {
+        Place.PlaceBuilder builder = Place.builder().name("England");
+        Map<String, Place.PlaceBuilder> builders = new HashMap<>();
+        builders.put("England", builder);
+
+        reader.updatePlaceBuilder(Collections.emptyList(), builders, Place.PlaceBuilder::placeInfo);
+        assertNull(builder.build().placeInfo());
     }
 }

@@ -1,20 +1,19 @@
 /* (C)2026 */
-package com.worldquiz.game;
+package com.worldquiz.service;
 
 import com.worldquiz.entities.*;
 import java.util.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-public class GameManager {
-    private final CardManager cardManager;
+@Service
+@RequiredArgsConstructor
+public class GameService {
+    private final CardService cardService;
     private final Map<UUID, Game> games;
 
-    public GameManager(CardManager cardManager) {
-        this.cardManager = cardManager;
-        this.games = new HashMap<>();
-    }
-
     public Game createGame(List<Category> categories, List<Tag> tags, int maxNumberOfCards) {
-        List<Card> cards = cardManager.getCards(maxNumberOfCards, categories, Set.copyOf(tags));
+        List<Card> cards = cardService.getCards(maxNumberOfCards, categories, Set.copyOf(tags));
         Game game = new Game(UUID.randomUUID(), cards);
         games.put(game.id(), game);
         return game;
