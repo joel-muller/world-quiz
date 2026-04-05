@@ -1,0 +1,46 @@
+name: Client Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: client
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and tag Docker image
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          echo "Building Docker image for tag $TAG_NAME, commit $COMMIT_SHA"
+          docker build -t ghcr.io/${{ github.repository_owner }}/world-quiz-client:${TAG_NAME} .
+          docker tag ghcr.io/${{ github.repository_owner }}/world-quiz-client:${TAG_NAME} ghcr.io/${{ github.repository_owner }}/world-quiz-client:${COMMIT_SHA}
+          docker tag ghcr.io/${{ github.repository_owner }}/world-quiz-client:${TAG_NAME} ghcr.io/${{ github.repository_owner }}/world-quiz-client:latest
+
+      - name: Push Docker images to GHCR
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          docker push ghcr.io/${{ github.repository_owner }}/world-quiz-client:${TAG_NAME}
+          docker push ghcr.io/${{ github.repository_owner }}/world-quiz-client:${COMMIT_SHA}
+          docker push ghcr.io/${{ github.repository_owner }}/world-quiz-client:latest
