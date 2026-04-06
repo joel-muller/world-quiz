@@ -11,9 +11,7 @@ services:
     container_name: world-quiz-client
     restart: unless-stopped
     expose:
-      - "80"
-    environment:
-      NODE_ENV: production
+      - "8080"
     depends_on:
       - server
 

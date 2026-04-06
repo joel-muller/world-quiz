@@ -1,6 +1,6 @@
-{$HOSTNAME} {
+:80 {
     reverse_proxy /api/* server:8080
-    reverse_proxy /* client:80
+    reverse_proxy /* client:8080
 
     log {
         output stdout
