@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://localhost:4200", "https://world-quiz.org"})
 @RequestMapping("/api/quiz")
 @RequiredArgsConstructor
 public class Controller {
