@@ -1,14 +1,49 @@
 services:
   server:
-    build: ./server
-    ports:
-      - "8080:8080"
+    image: ghcr.io/joel-muller/world-quiz-server:latest
+    container_name: world-quiz-server
+    restart: unless-stopped
+    expose:
+      - "8080"
 
   client:
-    build: ./client
-    ports:
-      - "4200:8080"
+    image: ghcr.io/joel-muller/world-quiz-client:latest
+    container_name: world-quiz-client
+    restart: unless-stopped
+    expose:
+      - "80"
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
     depends_on:
       - server
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      HOSTNAME: ${HOSTNAME}
+    depends_on:
+      - client
+      - server
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared_tunnel_sonar
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARED_TUNNEL_TOKEN}
+    depends_on:
+      - caddy
+    restart: always
+
+volumes:
+  caddy_data:
+  caddy_config:

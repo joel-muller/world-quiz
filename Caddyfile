@@ -1,0 +1,11 @@
+{$HOSTNAME} {
+    reverse_proxy /api/* server:8080
+    reverse_proxy /* client:80
+
+    log {
+        output stdout
+        format console
+    }
+
+    encode zstd gzip
+}
