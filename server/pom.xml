@@ -125,7 +125,7 @@
         <junit.version>6.0.0</junit.version>
 
         <openjfx.version>21.0.8</openjfx.version>
-        <springboot.version>3.5.10</springboot.version>
+        <springboot.version>3.5.13</springboot.version>
         <spotless.version>3.2.1</spotless.version>
         <lombok.version>1.18.44</lombok.version>
     </properties>
@@ -210,6 +210,12 @@
                 <version>${springboot.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-mongodb</artifactId>
+                <version>${springboot.version}</version>
+                <scope>compile</scope>
+            </dependency>
             <!-- Source: https://mvnrepository.com/artifact/com.opencsv/opencsv -->
             <dependency>
                 <groupId>com.opencsv</groupId>
@@ -271,6 +277,10 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
     </dependencies>
 
