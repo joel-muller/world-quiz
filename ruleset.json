@@ -1,0 +1,25 @@
+{
+  "id": 15739378,
+  "name": "protect main branch",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "joel-muller/world-quiz",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [],
+      "include": [
+        "refs/heads/main"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    }
+  ],
+  "bypass_actors": []
+}
