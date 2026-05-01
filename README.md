@@ -20,3 +20,9 @@ Create a `.env` file in the root of the project and add following values to it:
 ```shell
 CLOUDFLARED_TUNNEL_TOKEN=<TunnelToken>
 ```
+
+### Security
+
+```shell
+openssl rand -base64 32
+```

@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
 import { Dashboard } from './dashboard/dashboard';
 import { QuizManager } from './quiz-manager/quiz-manager';
-import { Account } from './account/account';
+import { Login } from './login/login';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'quiz',
-    pathMatch: 'full',
+    component: QuizManager,
+    title: 'Quiz',
   },
   {
     path: 'dashboard',
@@ -15,13 +15,8 @@ export const routes: Routes = [
     title: 'Dashboard',
   },
   {
-    path: 'quiz',
-    component: QuizManager,
-    title: 'Quiz',
-  },
-  {
-    path: 'account',
-    component: Account,
-    title: 'Account',
+    path: 'login',
+    component: Login,
+    title: 'Login',
   },
 ];

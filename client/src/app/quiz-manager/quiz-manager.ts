@@ -5,6 +5,7 @@ import { Quiz } from '../entities/Quiz';
 import { Tag } from '../entities/Tag';
 import { Category } from '../entities/Category';
 import { FormsModule } from '@angular/forms';
+import { RequestGame } from '../entities/Dto';
 
 interface TagOption {
   name: string;
@@ -76,7 +77,13 @@ export class QuizManager {
     const tagsArray = this.tagOptions.filter((t) => t.selected).map((t) => t.value);
     const categoryArray = this.categoryOptions.filter((c) => c.selected).map((c) => c.value);
 
-    this.quizService.fetchQuiz(categoryArray, tagsArray, this.maxCards).subscribe({
+    const request: RequestGame = {
+      categories: categoryArray,
+      tags: tagsArray,
+      number: this.maxCards,
+    };
+
+    this.quizService.fetchQuiz(request).subscribe({
       next: (data) => {
         this.quiz = data;
         if (data.cards.length === 0) {

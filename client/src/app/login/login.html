@@ -1,0 +1,42 @@
+<h1>Welcome to World Quiz</h1>
+
+<p>Login to start the game</p>
+
+@switch (page()) {
+  @case (Page.Login) {
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+      <input type="text" placeholder="Username or Email" formControlName="usernameOrEmail" />
+      <input type="password" placeholder="Password" formControlName="password" />
+      <button type="submit" [disabled]="loading() || loginForm.invalid">
+        @if (loading()) {
+          Logging in...
+        } @else {
+          Login
+        }
+      </button>
+    </form>
+
+    <button (click)="page.set(Page.Register)">Register</button>
+  }
+  @case (Page.Register) {
+    <form [formGroup]="registerForm" (ngSubmit)="register()">
+      <input type="text" placeholder="Username" formControlName="username" />
+      <input type="password" placeholder="Password" formControlName="password1" />
+      <input type="password" placeholder="Password" formControlName="password2" />
+      <input type="email" placeholder="Email" formControlName="email" />
+      <button type="submit" [disabled]="loading() || registerForm.invalid">
+        @if (loading()) {
+          Register in...
+        } @else {
+          Register
+        }
+      </button>
+    </form>
+
+    <button (click)="page.set(Page.Login)">Login</button>
+  }
+}
+
+@if (error()) {
+  <p style="color: red">{{ error() }}</p>
+}
