@@ -7,11 +7,16 @@ mvn spotless:check
 mvn spotless:apply
 ```
 
-## Test Router
+## Run Project Locally
+
+Start the docker compose in `local/compose.yml` and export the environment variables (see also readme from Project)
 
 ```shell
-curl "http://localhost:8080/quiz/hello?name=Alice"
+export $(cat .env | xargs)
 ```
 
-export $(cat .env | xargs)
+Start Springboot with maven
+
+```shell
 mvn spring-boot:run
+```

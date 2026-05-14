@@ -1,9 +1,6 @@
 # World-Quiz
 
-> [!IMPORTANT]
-> This application is still under development
-
-With World Quiz, you can learn the Capital, Maps and Flag from all over the world. 
+With World Quiz, you can learn the Capital, Maps and Flag from all over the world.
 
 ## Deployment
 
@@ -19,9 +16,14 @@ Create a `.env` file in the root of the project and add following values to it:
 
 ```shell
 CLOUDFLARED_TUNNEL_TOKEN=<TunnelToken>
+MONGO_URI=<Mongo DB Connection String>
+JWT_SECRET=<Jwt Secret>
+MAILGUN_API_KEY=<Mailgun Api Key>
+MAILGUN_URL=<Mailgun URL>
+MAILGUN_SENDER_EMAIL=<Mailgun Sender Email>
 ```
 
-### Security
+### JWT Secret Creation
 
 ```shell
 openssl rand -base64 32
