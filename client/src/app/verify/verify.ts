@@ -28,6 +28,7 @@ export class Verify implements OnInit {
 
     this.authService.verifyEmail(request).subscribe({
       next: async () => {
+        this.authService.logout();
         await this.router.navigate(['']);
       },
       error: (err) => {

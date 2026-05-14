@@ -35,7 +35,7 @@ export class AuthService {
     );
   }
 
-  createUser(request: RegisterRequest) {
+  register(request: RegisterRequest) {
     return this.http.post(`${environment.apiUrl}/auth/register`, request);
   }
 
@@ -52,20 +52,17 @@ export class AuthService {
       .pipe(tap((res) => this.setTokens(res)));
   }
 
-  verifyEmail(request: VerifyEmailRequest): Observable<UserResponse> {
-    return this.http
-      .post<void>(`${environment.apiUrl}/auth/verify-email`, request)
-      .pipe(switchMap(() => this.getUser()));
+  verifyEmail(request: VerifyEmailRequest) {
+    return this.http.post(`${environment.apiUrl}/auth/verify-email`, request);
   }
 
-  resendVerification(request: ResendVerificationRequest): Observable<void> {
-    return this.http.post<void>(`${environment.apiUrl}/auth/resend-verification`, request);
+  resendVerification(request: ResendVerificationRequest) {
+    return this.http.post(`${environment.apiUrl}/auth/resend-verification`, request);
   }
 
   logout() {
     this.clearTokens();
-    this.user.set(null);
-    localStorage.removeItem('user');
+    this.clearUser();
   }
 
   getAccessToken(): string | null {
@@ -86,5 +83,10 @@ export class AuthService {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     this.token.set(null);
+  }
+
+  clearUser() {
+    this.user.set(null);
+    localStorage.removeItem('user');
   }
 }

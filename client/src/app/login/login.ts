@@ -73,7 +73,7 @@ export class Login {
       email: this.registerForm.getRawValue().email,
     };
 
-    this.authService.createUser(req).subscribe({
+    this.authService.register(req).subscribe({
       next: () => {
         this.loading.set(false);
         this.info.set('Registration Successful, verify the email we sent to you');
