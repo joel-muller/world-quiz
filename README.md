@@ -16,11 +16,14 @@ Create a `.env` file in the root of the project and add following values to it:
 
 ```shell
 CLOUDFLARED_TUNNEL_TOKEN=<TunnelToken>
-MONGO_URI=<Mongo DB Connection String>
 JWT_SECRET=<Jwt Secret>
 MAILGUN_API_KEY=<Mailgun Api Key>
 MAILGUN_URL=<Mailgun URL>
 MAILGUN_SENDER_EMAIL=<Mailgun Sender Email>
+MONGO_INITDB_ROOT_USERNAME=<Mongo DB Username>
+MONGO_INITDB_ROOT_PASSWORD=<Mongo DB Password>
+ME_CONFIG_BASICAUTH_USERNAME=<Mongo Express Username>
+ME_CONFIG_BASICAUTH_PASSWORD=<Mongo Express Password>
 ```
 
 ### JWT Secret Creation

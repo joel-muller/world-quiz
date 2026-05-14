@@ -3,8 +3,16 @@ services:
     image: ghcr.io/joel-muller/world-quiz-server:latest
     container_name: world-quiz-server
     restart: unless-stopped
+    environment:
+      MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/world-quiz?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      MAILGUN_API_KEY: ${MAILGUN_API_KEY}
+      MAILGUN_URL: ${MAILGUN_URL}
+      MAILGUN_SENDER_EMAIL: ${MAILGUN_SENDER_EMAIL}
     expose:
       - "8080"
+    depends_on:
+      - mongo
 
   client:
     image: ghcr.io/joel-muller/world-quiz-client:latest
@@ -14,6 +22,26 @@ services:
       - "8080"
     depends_on:
       - server
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/world-quiz?authSource=admin
+      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_CONFIG_BASICAUTH_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_CONFIG_BASICAUTH_PASSWORD}
 
   caddy:
     image: caddy:latest
