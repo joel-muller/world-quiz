@@ -1,9 +1,18 @@
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  HostListener,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { QuizService } from '../quiz-service';
 import { Quiz } from '../entities/Quiz';
 import { Card } from '../entities/Card';
-import { GameStats } from '../entities/GameStats';
 import { Category } from '../entities/Category';
+import { FinishGameRequest, GameStatResponse } from '../entities/Dto';
 
 @Component({
   selector: 'app-quiz-detail',
@@ -12,59 +21,61 @@ import { Category } from '../entities/Category';
   styleUrl: './quiz-detail.css',
 })
 export class QuizDetail {
-  @Input({ required: true }) quiz!: Quiz;
-  @Output() quizFinished = new EventEmitter<void>();
-  cards: Card[] = [];
-  currentCard: Card | null = null;
-  stats: GameStats | null = null;
-  showBack: boolean = false;
+  quiz = input.required<Quiz>();
+  quizFinished = output<void>();
 
-  constructor(private quizService: QuizService) {}
+  cards = signal<Card[]>([]);
+  stats = signal<GameStatResponse | null>(null);
+  showBack = signal(false);
 
-  ngOnInit() {
-    this.cards = this.quiz.cards;
-    this.loadCard();
+  private quizService: QuizService = inject(QuizService);
+
+  constructor() {
+    effect(() => {
+      const quiz = this.quiz();
+      this.cards.set([...quiz.cards]);
+    });
   }
 
-  getTextCardFlipper() {
-    return this.showBack ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+  readonly currentCard = computed(() => this.cards()[0]);
+
+  readonly cardFlipperIcon = computed(() =>
+    this.showBack() ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye',
+  );
+
+  toggleBack() {
+    this.showBack.update((v) => !v);
   }
 
-  toggleBack(): void {
-    this.showBack = !this.showBack;
-  }
-
-  loadCard() {
-    if (this.cards.length > 0) {
-      this.currentCard = this.cards[0];
-    } else {
-      this.currentCard = null;
-    }
-  }
-
-  guess(right: boolean): void {
-    if (!this.showBack) {
-      this.showBack = true;
+  guess(right: boolean) {
+    if (!this.showBack()) {
+      this.showBack.set(true);
       return;
     }
-    let front = this.cards.shift();
-    if (front && !right) {
-      this.cards.push(front);
-    }
-    this.showBack = false;
-    this.loadCard();
 
-    if (this.currentCard == null) {
+    this.cards.update((cards) => {
+      const [front, ...rest] = cards;
+
+      if (!front) {
+        return cards;
+      }
+
+      return right ? rest : [...rest, front];
+    });
+
+    this.showBack.set(false);
+
+    if (!this.currentCard()) {
       this.getStats();
     }
   }
 
-  abortQuiz(): void {
-    this.currentCard = null;
+  abortQuiz() {
+    this.cards.set([]);
     this.getStats();
   }
 
-  closeQuiz(): void {
+  closeQuiz() {
     this.quizFinished.emit();
   }
 
@@ -74,20 +85,18 @@ export class QuizDetail {
       event.preventDefault();
       this.guess(true);
     }
+
     if (event.key === '1') {
       event.preventDefault();
       this.guess(false);
     }
   }
 
-  private getStats(): void {
-    this.quizService.finishGame(this.quiz.id).subscribe({
+  private getStats() {
+    const request: FinishGameRequest = { id: this.quiz().id };
+    this.quizService.finishGame(request).subscribe({
       next: (stats) => {
-        this.stats = stats;
-        console.log('Quiz finished, stats:', stats);
-      },
-      error: (err) => {
-        console.error('Failed to finish quiz', err);
+        this.stats.set(stats);
       },
     });
   }

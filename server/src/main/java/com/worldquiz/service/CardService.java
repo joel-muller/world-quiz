@@ -9,14 +9,16 @@ import com.worldquiz.reader.PlaceReader;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CardService {
     private final PlaceReader placeReader;
 
-    public List<Card> getCards(int numberOfCards, List<Category> categories, Set<Tag> tags) {
+    public List<Card> getCards(Integer numberOfCards, List<Category> categories, List<Tag> tags) {
         Objects.requireNonNull(categories);
         Objects.requireNonNull(tags);
 
@@ -37,7 +39,10 @@ public class CardService {
 
         Collections.shuffle(allCards);
 
-        return allCards.stream().limit(numberOfCards).toList();
+        if (numberOfCards != null) {
+            return allCards.stream().limit(numberOfCards).toList();
+        }
+        return allCards;
     }
 
     private static Card getCard(Place place, Category category) {
@@ -94,7 +99,8 @@ public class CardService {
         };
     }
 
-    private static boolean hasAtLeastOneTag(Place place, Set<Tag> tags) {
-        return place.tags().stream().anyMatch(tags::contains);
+    private static boolean hasAtLeastOneTag(Place place, List<Tag> tags) {
+        Set<Tag> tagsSet = Set.copyOf(tags);
+        return place.tags().stream().anyMatch(tagsSet::contains);
     }
 }

@@ -12,3 +12,6 @@ mvn spotless:apply
 ```shell
 curl "http://localhost:8080/quiz/hello?name=Alice"
 ```
+
+export $(cat .env | xargs)
+mvn spring-boot:run

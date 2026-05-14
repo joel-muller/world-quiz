@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { QuizService } from '../quiz-service';
 import { QuizDetail } from '../quiz-detail/quiz-detail';
 import { Quiz } from '../entities/Quiz';
 import { Tag } from '../entities/Tag';
 import { Category } from '../entities/Category';
 import { FormsModule } from '@angular/forms';
-import { RequestGame } from '../entities/Dto';
+import { AuthService } from '../auth-service';
+import { CreateQuizRequest } from '../entities/Dto';
 
 interface TagOption {
   name: string;
@@ -26,12 +27,20 @@ interface CategoryOption {
   styleUrl: './quiz-manager.css',
 })
 export class QuizManager {
-  quiz: Quiz | null = null;
-  active: boolean = false;
-  currentError: string | null = null;
-  maxCards: number | undefined = undefined;
+  private quizService: QuizService = inject(QuizService);
+  private authService: AuthService = inject(AuthService);
 
-  tagOptions: TagOption[] = [
+  currentUser = computed(() => {
+    return this.authService.currentUser();
+  });
+
+  verificationMailSent = signal(false);
+
+  quiz = signal<Quiz | null>(null);
+  currentError = signal<string | null>(null);
+  maxCards = signal<number | undefined>(undefined);
+
+  tagOptions = signal<TagOption[]>([
     { name: 'Europe', value: Tag.EUROPE, selected: false },
     { name: 'Asia', value: Tag.ASIA, selected: false },
     { name: 'Oceania', value: Tag.OCEANIA, selected: false },
@@ -40,96 +49,103 @@ export class QuizManager {
     { name: 'Africa', value: Tag.AFRICA, selected: false },
     { name: 'Oceans and Seas', value: Tag.OCEANS_AND_SEAS, selected: false },
     { name: 'Continents', value: Tag.CONTINENTS, selected: false },
-  ];
+  ]);
 
-  categoryOptions: CategoryOption[] = [
+  categoryOptions = signal<CategoryOption[]>([
     { name: 'Map → Name (Capital)', value: Category.MAP_NAME, selected: false },
     { name: 'Flag → Name (Capital)', value: Category.FLAG_NAME, selected: false },
     { name: 'Capital → Name', value: Category.CAPITAL_NAME, selected: false },
     { name: 'Name → Capital', value: Category.NAME_CAPITAL, selected: false },
-  ];
+  ]);
 
-  constructor(private quizService: QuizService) {}
+  quizReady = computed(() => {
+    const maxCards = this.maxCards();
 
-  quizReady(): boolean {
-    if (this.maxCards != null && this.maxCards <= 0) {
-      return false;
-    }
+    const validMaxCards = maxCards == null || (maxCards > 0 && maxCards <= 1_000_000);
 
-    if (this.maxCards && this.maxCards > 1000000) {
-      return false;
-    }
+    return validMaxCards && this.selectedTags().length > 0 && this.selectedCategories().length > 0;
+  });
 
-    if (this.tagOptions.filter((t) => t.selected).length === 0) {
-      return false;
-    }
+  selectedTags = computed(() =>
+    this.tagOptions()
+      .filter((t) => t.selected)
+      .map((t) => t.value),
+  );
 
-    if (this.categoryOptions.filter((c) => c.selected).length === 0) {
-      return false;
-    }
-    return true;
+  selectedCategories = computed(() =>
+    this.categoryOptions()
+      .filter((c) => c.selected)
+      .map((c) => c.value),
+  );
+
+  toggleTag(value: Tag) {
+    this.tagOptions.update((tags) =>
+      tags.map((tag) => (tag.value === value ? { ...tag, selected: !tag.selected } : tag)),
+    );
+  }
+
+  toggleCategory(value: Category) {
+    this.categoryOptions.update((categories) =>
+      categories.map((category) =>
+        category.value === value ? { ...category, selected: !category.selected } : category,
+      ),
+    );
+  }
+
+  setAllTags(selected: boolean) {
+    this.tagOptions.update((tags) => tags.map((tag) => ({ ...tag, selected })));
+  }
+
+  setAllCategories(selected: boolean) {
+    this.categoryOptions.update((categories) =>
+      categories.map((category) => ({ ...category, selected })),
+    );
   }
 
   fetchQuiz() {
-    if (!this.quizReady()) {
-      return;
-    }
-    const tagsArray = this.tagOptions.filter((t) => t.selected).map((t) => t.value);
-    const categoryArray = this.categoryOptions.filter((c) => c.selected).map((c) => c.value);
+    if (!this.quizReady()) return;
 
-    const request: RequestGame = {
-      categories: categoryArray,
-      tags: tagsArray,
-      number: this.maxCards,
+    const request: CreateQuizRequest = {
+      categories: this.selectedCategories(),
+      tags: this.selectedTags(),
+      number: this.maxCards(),
     };
 
     this.quizService.fetchQuiz(request).subscribe({
-      next: (data) => {
-        this.quiz = data;
-        if (data.cards.length === 0) {
-          this.currentError = 'Ups, it seems that there are no cards with that selection';
-        } else {
-          this.active = true;
-          this.resetSelectedValues();
+      next: (quiz) => {
+        if (quiz.cards.length === 0) {
+          this.currentError.set('Ups, it seems that there are no cards with that selection');
+          return;
         }
+        this.quiz.set(quiz);
+        this.resetSelectedValues();
       },
-      error: (err) => {
-        this.currentError = 'Failed to fetch quiz. Please try again later.';
-        console.log(err);
+      error: () => {
+        this.currentError.set('Failed to fetch quiz. Please try again later.');
       },
     });
   }
 
-  onQuizFinished() {
-    this.active = false;
-  }
-
-  toggleTag(value: Tag): void {
-    const tag = this.tagOptions.find((t) => t.value === value);
-    if (tag) {
-      tag.selected = !tag.selected;
-    }
-  }
-
-  setAllTags(value: boolean): void {
-    this.tagOptions.forEach((tag) => (tag.selected = value));
-  }
-
-  toggleCategory(value: Category): void {
-    const category = this.categoryOptions.find((c) => c.value === value);
-    if (category) {
-      category.selected = !category.selected;
-    }
-  }
-
-  setAllCategories(value: boolean): void {
-    this.categoryOptions.forEach((c) => (c.selected = value));
-  }
-
   resetSelectedValues() {
-    this.maxCards = undefined;
-    this.currentError = null;
+    this.maxCards.set(undefined);
+    this.currentError.set(null);
+
     this.setAllTags(false);
     this.setAllCategories(false);
+  }
+
+  onQuizFinished() {
+    this.quiz.set(null);
+  }
+
+  resendVerificationMail() {
+    const user = this.currentUser();
+    if (user) {
+      this.authService.resendVerification({ email: user.email }).subscribe({
+        next: () => {
+          this.verificationMailSent.set(true);
+        },
+      });
+    }
   }
 }

@@ -1,26 +1,35 @@
 /* (C)2026 */
 package com.worldquiz.service;
 
+import com.worldquiz.dto.CreateQuizRequest;
+import com.worldquiz.dto.FinishGameRequest;
+import com.worldquiz.dto.GameStatResponse;
 import com.worldquiz.entities.*;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GameService {
     private final CardService cardService;
-    private final Map<UUID, Game> games;
+    private final Map<UUID, Quiz> games;
 
-    public Game createGame(List<Category> categories, List<Tag> tags, int maxNumberOfCards) {
-        List<Card> cards = cardService.getCards(maxNumberOfCards, categories, Set.copyOf(tags));
-        Game game = new Game(UUID.randomUUID(), cards);
-        games.put(game.id(), game);
-        return game;
+    public Quiz createGame(CreateQuizRequest createQuizRequest, User user) {
+        List<Card> cards =
+                cardService.getCards(
+                        createQuizRequest.number(),
+                        createQuizRequest.categories(),
+                        createQuizRequest.tags());
+        Quiz quiz = new Quiz(UUID.randomUUID(), cards);
+        games.put(quiz.id(), quiz);
+        return quiz;
     }
 
-    public GameStat finishGame(UUID id) {
-        games.remove(id);
-        return new GameStat(id, "Well done");
+    public GameStatResponse finishGame(FinishGameRequest request) {
+        games.remove(request.id());
+        return new GameStatResponse(request.id(), "Well done");
     }
 }

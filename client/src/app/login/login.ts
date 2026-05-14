@@ -1,7 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
-import { QuizService } from '../quiz-service';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RequestUser } from '../entities/Dto';
+import { Router } from '@angular/router';
+import { AuthService } from '../auth-service';
+import { RegisterRequest } from '../entities/Dto';
 
 enum Page {
   Login,
@@ -15,10 +16,12 @@ enum Page {
   styleUrl: './login.css',
 })
 export class Login {
-  quizService = inject(QuizService);
+  authService = inject(AuthService);
+  router = inject(Router);
 
   loading = signal(false);
   error = signal<string | null>(null);
+  info = signal<string | null>(null);
   page = signal<Page>(Page.Login);
 
   protected readonly Page = Page;
@@ -41,9 +44,10 @@ export class Login {
     this.loading.set(true);
     this.error.set(null);
 
-    this.quizService.login(this.loginForm.getRawValue()).subscribe({
-      next: () => {
+    this.authService.login(this.loginForm.getRawValue()).subscribe({
+      next: async () => {
         this.loading.set(false);
+        await this.router.navigate(['']);
       },
       error: () => {
         this.loading.set(false);
@@ -58,21 +62,26 @@ export class Login {
     this.loading.set(true);
     this.error.set(null);
 
-    // TODO: Check if the two passwords are equal lenght
-    const req: RequestUser = {
+    if (this.registerForm.getRawValue().password2 !== this.registerForm.getRawValue().password1) {
+      this.error.set('Passwords do not match');
+      return;
+    }
+
+    const req: RegisterRequest = {
       username: this.registerForm.getRawValue().username,
       password: this.registerForm.getRawValue().password1,
       email: this.registerForm.getRawValue().email,
     };
 
-    this.quizService.createUser(req).subscribe({
+    this.authService.createUser(req).subscribe({
       next: () => {
         this.loading.set(false);
+        this.info.set('Registration Successful, verify the email we sent to you');
         this.page.set(Page.Login);
       },
       error: () => {
         this.loading.set(false);
-        this.error.set('Login failed');
+        this.error.set('Registration failed');
       },
     });
   }

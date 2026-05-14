@@ -1,31 +1,35 @@
 /* (C)2026 */
 package com.worldquiz.controller;
 
-import com.worldquiz.dto.RequestGame;
-import com.worldquiz.entities.Game;
-import com.worldquiz.entities.GameStat;
+import com.worldquiz.dto.CreateQuizRequest;
+import com.worldquiz.dto.FinishGameRequest;
+import com.worldquiz.dto.GameStatResponse;
+import com.worldquiz.entities.Quiz;
+import com.worldquiz.entities.User;
 import com.worldquiz.service.GameService;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/quiz")
 @RequiredArgsConstructor
+@Slf4j
 public class GameController {
     private final GameService gameService;
 
-    @PostMapping
-    public ResponseEntity<Game> createGame(@RequestBody RequestGame request) {
-        int numberOfCards = request.number() != null ? request.number() : 1000000;
-        Game game = gameService.createGame(request.categories(), request.tags(), numberOfCards);
-        return ResponseEntity.ok(game);
+    @PostMapping("/create")
+    public ResponseEntity<Quiz> createGame(
+            @RequestBody CreateQuizRequest request, @AuthenticationPrincipal User user) {
+        Quiz quiz = gameService.createGame(request, user);
+        return ResponseEntity.ok(quiz);
     }
 
-    @PostMapping("/{id}/finish")
-    public ResponseEntity<GameStat> finishGame(@PathVariable("id") UUID id) {
-        GameStat stat = gameService.finishGame(id);
+    @PostMapping("/finish")
+    public ResponseEntity<GameStatResponse> finishGame(@RequestBody FinishGameRequest request) {
+        GameStatResponse stat = gameService.finishGame(request);
         return ResponseEntity.ok(stat);
     }
 }

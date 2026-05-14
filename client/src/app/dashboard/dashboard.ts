@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
-import { QuizService } from '../quiz-service';
+import { Component, computed, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../auth-service';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,5 +9,15 @@ import { QuizService } from '../quiz-service';
   styleUrl: './dashboard.css',
 })
 export class Dashboard {
-  protected quizService = inject(QuizService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  currentUser = computed(() => {
+    return this.authService.currentUser();
+  });
+
+  async logout() {
+    this.authService.logout();
+    await this.router.navigate(['']);
+  }
 }

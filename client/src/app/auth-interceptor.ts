@@ -2,10 +2,11 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { QuizService } from './quiz-service';
 import { catchError, switchMap, throwError } from 'rxjs';
+import { AuthService } from './auth-service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const quizService = inject(QuizService);
-  const token = quizService.getAccessToken();
+  const authService = inject(AuthService);
+  const token = authService.getAccessToken();
 
   const authReq = token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
 
@@ -15,15 +16,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
 
-      const refreshToken = quizService.getRefreshToken();
+      const refreshToken = authService.getRefreshToken();
       if (!refreshToken) {
-        quizService.logout();
+        authService.logout();
         return throwError(() => err);
       }
 
-      return quizService.refresh({ refreshToken }).pipe(
+      return authService.refresh({ refreshToken }).pipe(
         switchMap((res) => {
-          quizService.setTokens(res);
+          authService.setTokens(res);
 
           return next(
             req.clone({

@@ -1,33 +1,33 @@
-@if (this.currentCard) {
+@if (this.currentCard(); as card) {
   <div class="card">
     <div>
-      @switch (currentCard.category) {
+      @switch (card.category) {
         @case (Category.MAP_NAME) {
-          <img class="quiz-image" [src]="'/media/maps/' + currentCard.front" alt="Map" />
+          <img class="quiz-image" [src]="'/media/maps/' + card.front" alt="Map" />
         }
         @case (Category.FLAG_NAME) {
-          <img class="quiz-image" [src]="'/media/flags/' + currentCard.front" alt="Flag" />
+          <img class="quiz-image" [src]="'/media/flags/' + card.front" alt="Flag" />
         }
         @case (Category.CAPITAL_NAME) {
           <p class="quiz-question">
-            Where the Capital is <strong>{{ currentCard.front }}</strong
+            Where the Capital is <strong>{{ card.front }}</strong
             >?
           </p>
         }
         @default {
           <p class="quiz-question">
-            Capital of <strong>{{ currentCard.front }}</strong>
+            Capital of <strong>{{ card.front }}</strong>
           </p>
         }
       }
 
-      @if (currentCard.infoFront) {
+      @if (card.infoFront) {
         <div class="quiz-info">
           <div>
             <i class="fa-solid fa-circle-info fa-2x"></i>
           </div>
           <div>
-            <p>{{ currentCard.infoFront }}</p>
+            <p>{{ card.infoFront }}</p>
           </div>
         </div>
       }
@@ -36,35 +36,36 @@
     <div>
       <hr />
 
-      @if (showBack) {
-        <p class="quiz-answer">{{ currentCard.back }}</p>
-        @if (currentCard.infoBack) {
+      @if (showBack()) {
+        <p class="quiz-answer">{{ card.back }}</p>
+        @if (card.infoBack) {
           <div class="quiz-info">
             <div>
               <i class="fa-solid fa-circle-info fa-2x"></i>
             </div>
             <div>
-              <p>{{ currentCard.infoBack }}</p>
+              <p>{{ card.infoBack }}</p>
             </div>
           </div>
         }
       }
 
       <button class="btn" (click)="toggleBack()">
-        <i [class]="getTextCardFlipper()"></i>
+        <i [class]="cardFlipperIcon()"></i>
       </button>
       <button class="btn btn-success" (click)="guess(true)">
         <i class="fa-solid fa-check"></i>
       </button>
       <button class="btn btn-danger" (click)="guess(false)"><i class="fa-solid fa-x"></i></button>
       <button class="btn btn-secondary" (click)="abortQuiz()">Abort Quiz</button>
+      <p>{{ cards().length }} of {{ quiz().cards.length }} left</p>
     </div>
   </div>
 } @else {
   <p>🎉 Congratulations, you finished the quiz!</p>
 
-  @if (this.stats) {
-    <p>{{ this.stats.info }}</p>
+  @if (this.stats(); as stats) {
+    <p>{{ stats.info }}</p>
   }
   <button class="btn btn-secondary" (click)="closeQuiz()">Close</button>
 }

@@ -1,1 +1,10 @@
-<button (click)="this.quizService.logout()">Logout</button>
+@if (currentUser(); as user) {
+  <h1>Hello {{ user.username }}</h1>
+  @if (user.emailConfirmed) {
+    <p>Your email {{ user.email }} is confirmed</p>
+  } @else {
+    <p>Your email {{ user.email }} is not confirmed</p>
+  }
+}
+
+<button (click)="logout()">Logout</button>

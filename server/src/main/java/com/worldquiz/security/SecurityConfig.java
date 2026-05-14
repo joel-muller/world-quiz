@@ -1,7 +1,6 @@
 /* (C)2026 */
 package com.worldquiz.security;
 
-import com.worldquiz.service.JwtService;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +37,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtService jwtService)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter)
             throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable)
@@ -52,8 +51,7 @@ public class SecurityConfig {
                                         .anyRequest()
                                         .authenticated())
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .addFilterBefore(
-                        new JwtAuthFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

@@ -50,13 +50,14 @@ class CardServiceTest {
 
     @Test
     void testGetCards_limitNumberOfCards() {
-        List<Card> cards = cardService.getCards(1, List.of(Category.MAP_NAME), Set.of(Tag.EUROPE));
+        List<Card> cards = cardService.getCards(1, List.of(Category.MAP_NAME), List.of(Tag.EUROPE));
         assertEquals(1, cards.size());
     }
 
     @Test
     void testGetCards_filtersByCategory() {
-        List<Card> cards = cardService.getCards(10, List.of(Category.MAP_NAME), Set.of(Tag.EUROPE));
+        List<Card> cards =
+                cardService.getCards(10, List.of(Category.MAP_NAME), List.of(Tag.EUROPE));
         assertTrue(cards.stream().allMatch(card -> card.front() != null));
         // place2.maps is null, so should be excluded
         assertTrue(cards.stream().allMatch(card -> card.placeId() == 1));
@@ -64,15 +65,16 @@ class CardServiceTest {
 
     @Test
     void testGetCards_filtersByTag() {
-        Set<Tag> tagFilter = Set.of(Tag.SOVEREIGN_STATE);
+        List<Tag> tagFilter = List.of(Tag.SOVEREIGN_STATE);
         List<Card> cards = cardService.getCards(10, List.of(Category.FLAG_NAME), tagFilter);
         assertEquals(1, cards.size());
-        assertEquals(2, cards.get(0).placeId());
+        assertEquals(2, cards.getFirst().placeId());
     }
 
     @Test
     void testGetCards_mergeInfosCorrectlyForMapName() {
-        List<Card> cards = cardService.getCards(10, List.of(Category.MAP_NAME), Set.of(Tag.EUROPE));
+        List<Card> cards =
+                cardService.getCards(10, List.of(Category.MAP_NAME), List.of(Tag.EUROPE));
         Card card = cards.get(0);
         assertEquals("Info1 CapitalInfo1", card.infoBack());
     }
@@ -80,7 +82,7 @@ class CardServiceTest {
     @Test
     void testGetCards_mergeInfosCorrectlyForFlagName() {
         List<Card> cards =
-                cardService.getCards(10, List.of(Category.FLAG_NAME), Set.of(Tag.EUROPE));
+                cardService.getCards(10, List.of(Category.FLAG_NAME), List.of(Tag.EUROPE));
         // place1 and place2 have flags, both tags include EUROPE
         Card card = cards.stream().filter(c -> c.placeId() == 1).findFirst().orElseThrow();
         assertEquals("Info1 CapitalInfo1 FlagInfo1", card.infoBack());
@@ -89,7 +91,7 @@ class CardServiceTest {
     @Test
     void testGetCards_categoryCapitalName() {
         List<Card> cards =
-                cardService.getCards(10, List.of(Category.CAPITAL_NAME), Set.of(Tag.EUROPE));
+                cardService.getCards(10, List.of(Category.CAPITAL_NAME), List.of(Tag.EUROPE));
         Card card = cards.stream().filter(c -> c.placeId() == 1).findFirst().orElseThrow();
         assertEquals("London", card.front());
         assertEquals("CapitalInfo1", card.infoFront());
@@ -100,7 +102,7 @@ class CardServiceTest {
     @Test
     void testGetCards_categoryNameCapital() {
         List<Card> cards =
-                cardService.getCards(10, List.of(Category.NAME_CAPITAL), Set.of(Tag.EUROPE));
+                cardService.getCards(10, List.of(Category.NAME_CAPITAL), List.of(Tag.EUROPE));
         Card card = cards.stream().filter(c -> c.placeId() == 1).findFirst().orElseThrow();
         assertEquals("England", card.front());
         assertEquals("Info1", card.infoFront());
@@ -110,7 +112,7 @@ class CardServiceTest {
 
     @Test
     void testGetCards_emptyResultWhenNoTagMatch() {
-        Set<Tag> tagFilter = Set.of(Tag.ASIA);
+        List<Tag> tagFilter = List.of(Tag.ASIA);
         List<Card> cards = cardService.getCards(10, List.of(Category.FLAG_NAME), tagFilter);
         assertTrue(cards.isEmpty());
     }
@@ -119,7 +121,7 @@ class CardServiceTest {
     void testGetCards_emptyCategoriesThrows() {
         assertThrows(
                 NullPointerException.class,
-                () -> cardService.getCards(1, null, Set.of(Tag.EUROPE)));
+                () -> cardService.getCards(1, null, List.of(Tag.EUROPE)));
     }
 
     @Test

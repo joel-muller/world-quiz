@@ -1,38 +1,51 @@
-@if (this.active && quiz) {
-  <app-quiz-detail [quiz]="quiz" (quizFinished)="onQuizFinished()" />
-} @else {
-  <div class="select-header">
-    <div>
-      <h2>Categories</h2>
+@if (currentUser()?.emailConfirmed) {
+  @if (this.quiz(); as quiz) {
+    <app-quiz-detail [quiz]="quiz" (quizFinished)="onQuizFinished()" />
+  } @else {
+    <div class="select-header">
+      <div>
+        <h2>Categories</h2>
+      </div>
+      <div>
+        <button (click)="setAllTags(true)"><i class="fa-solid fa-check-double"></i></button>
+        <button (click)="setAllTags(false)"><i class="fa-solid fa-broom"></i></button>
+      </div>
     </div>
-    <div>
-      <button (click)="setAllTags(true)"><i class="fa-solid fa-check-double"></i></button>
-      <button (click)="setAllTags(false)"><i class="fa-solid fa-broom"></i></button>
-    </div>
-  </div>
-  @for (tag of tagOptions; track tag.value) {
-    <button (click)="toggleTag(tag.value)" [class.selected]="tag.selected">{{ tag.name }}</button>
-  } @empty {
-    <span>No tags available</span>
-  }
+    @for (tag of tagOptions(); track tag.value) {
+      <button (click)="toggleTag(tag.value)" [class.selected]="tag.selected">{{ tag.name }}</button>
+    } @empty {
+      <span>No tags available</span>
+    }
 
-  <div class="select-header">
-    <div>
-      <h2>Card Types</h2>
+    <div class="select-header">
+      <div>
+        <h2>Card Types</h2>
+      </div>
+      <div>
+        <button (click)="setAllCategories(true)"><i class="fa-solid fa-check-double"></i></button>
+        <button (click)="setAllCategories(false)"><i class="fa-solid fa-broom"></i></button>
+      </div>
     </div>
-    <div>
-      <button (click)="setAllCategories(true)"><i class="fa-solid fa-check-double"></i></button>
-      <button (click)="setAllCategories(false)"><i class="fa-solid fa-broom"></i></button>
-    </div>
-  </div>
-  @for (cat of categoryOptions; track cat.value) {
-    <button (click)="toggleCategory(cat.value)" [class.selected]="cat.selected">
-      {{ cat.name }}
-    </button>
-  } @empty {
-    <span>No tags available</span>
+    @for (cat of categoryOptions(); track cat.value) {
+      <button (click)="toggleCategory(cat.value)" [class.selected]="cat.selected">
+        {{ cat.name }}
+      </button>
+    } @empty {
+      <span>No tags available</span>
+    }
+    <h2>Start</h2>
+    <input type="number" [(ngModel)]="maxCards" placeholder="Enter max cards" />
+    <button [disabled]="!quizReady()" (click)="fetchQuiz()">Start quiz</button>
   }
-  <h2>Start</h2>
-  <input type="number" [(ngModel)]="maxCards" placeholder="Enter max cards" />
-  <button [disabled]="!quizReady()" (click)="fetchQuiz()">Start quiz</button>
+} @else {
+  @if (verificationMailSent()) {
+    <p>Email verification mail sent again</p>
+  } @else {
+    <p>You cannot play right now because your email is not verified verify now:</p>
+    <button (click)="resendVerificationMail()">Verify Email</button>
+  }
+}
+
+@if (currentError()) {
+  <p style="color: red">{{ currentError() }}</p>
 }

@@ -4,15 +4,25 @@ package com.worldquiz.service;
 import com.worldquiz.dto.AuthResponse;
 import com.worldquiz.dto.LoginRequest;
 import com.worldquiz.dto.RegisterRequest;
+import com.worldquiz.dto.VerifyEmailRequest;
+import com.worldquiz.entities.EmailSendLog;
+import com.worldquiz.entities.EmailVerificationToken;
 import com.worldquiz.entities.RefreshToken;
 import com.worldquiz.entities.User;
 import com.worldquiz.exceptions.*;
+import com.worldquiz.repository.EmailSendLogRepository;
+import com.worldquiz.repository.EmailVerificationTokenRepository;
 import com.worldquiz.repository.RefreshTokenRepository;
 import com.worldquiz.repository.UserRepository;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,13 +34,17 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final MailService mailService;
+    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
+    private final EmailSendLogRepository emailSendLogRepository;
 
-    public void register(RegisterRequest request) {
-        log.info(request.toString());
-        if (request.username().contains("@"))
-            throw new ValidationException("Username cannot contain '@'");
-        if (!request.email().contains("@")) throw new ValidationException("Invalid email format");
+    @Value("${mailgun.threshold.max}")
+    private int maxNumberOfMails;
 
+    @Value("${mailgun.threshold.user}")
+    private int maxNumberOfMailsPerUser;
+
+    public void register(RegisterRequest request, String frontendBaseUrl) {
         if (userRepository.existsByUsername(request.username())
                 || userRepository.existsByEmail(request.email())) {
             throw new UserAlreadyExistsException("User already exists");
@@ -39,8 +53,15 @@ public class AuthService {
         String hashedPassword = passwordEncoder.encode(request.password());
 
         User user =
-                new User(UUID.randomUUID(), request.username(), request.email(), hashedPassword);
+                new User(
+                        UUID.randomUUID(),
+                        request.username(),
+                        request.email(),
+                        hashedPassword,
+                        false);
         userRepository.save(user);
+
+        sendVerification(user, frontendBaseUrl);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -78,6 +99,73 @@ public class AuthService {
                         .orElseThrow(() -> new UserNotFoundException("user not found"));
 
         return getNewAuthResponse(user);
+    }
+
+    public void verifyEmail(VerifyEmailRequest request) {
+        EmailVerificationToken token =
+                emailVerificationTokenRepository
+                        .findByToken(request.token())
+                        .orElseThrow(() -> new InvalidTokenException("Token does not exist"));
+        if (token.expiresAt().isBefore(Instant.now()))
+            throw new TokenExpiredException("Verify Mail token expired");
+        User user =
+                userRepository
+                        .findById(token.userId())
+                        .orElseThrow(() -> new UserNotFoundException("User not found"));
+        if (user.emailConfirmed()) throw new EmailAlreadyConfirmed("Email Already confirmed");
+
+        emailVerificationTokenRepository.deleteByToken(token.token());
+        userRepository.save(user.confirmEmail());
+    }
+
+    public void resendVerification(String email, String frontendBaseUrl) {
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(
+                                () ->
+                                        new UserNotFoundException(
+                                                "User with the mail does not exist" + email));
+        this.sendVerification(user, frontendBaseUrl);
+    }
+
+    private void sendVerification(User user, String frontendBaseUrl) {
+        ZoneId zone = ZoneId.systemDefault();
+        LocalDate today = LocalDate.now(zone);
+
+        Instant start = today.atStartOfDay(zone).toInstant();
+        Instant end = today.plusDays(1).atStartOfDay(zone).toInstant();
+
+        long totalToday = emailSendLogRepository.countBySentAtBetween(start, end);
+
+        long userToday =
+                emailSendLogRepository.countByUserIdAndSentAtBetween(user.id(), start, end);
+
+        if (totalToday >= this.maxNumberOfMails || userToday >= maxNumberOfMailsPerUser) {
+            throw new TooManyMailsSent("Too Many Mails sent for today, try again Tomorrow");
+        }
+
+        Optional<EmailSendLog> lastMail =
+                emailSendLogRepository.findTopByUserIdOrderBySentAtDesc(user.id());
+        if (lastMail.isPresent()
+                && lastMail.get().sentAt().isAfter(Instant.now().minusSeconds(60))) {
+            throw new TooManyMailsSent("Please wait before requesting another email");
+        }
+
+        if (user.emailConfirmed()) throw new EmailAlreadyConfirmed("Email Already confirmed");
+
+        String token = UUID.randomUUID().toString();
+        Instant expiration = Instant.now().plus(Duration.ofHours(24));
+        EmailVerificationToken emailVerificationToken =
+                new EmailVerificationToken(
+                        UUID.randomUUID(), user.id(), token, expiration, Instant.now());
+
+        this.emailVerificationTokenRepository.deleteAllByUserId(user.id());
+        this.emailVerificationTokenRepository.save(emailVerificationToken);
+        this.emailSendLogRepository.save(
+                new EmailSendLog(UUID.randomUUID(), user.id(), Instant.now()));
+        this.mailService.sendEmailVerificationMail(
+                user.username(), user.email(), token, frontendBaseUrl);
     }
 
     private AuthResponse getNewAuthResponse(User user) {

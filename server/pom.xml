@@ -223,6 +223,12 @@
                 <version>${springboot.version}</version>
                 <scope>compile</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-validation</artifactId>
+                <version>${springboot.version}</version>
+                <scope>compile</scope>
+            </dependency>
             <!-- Source: https://mvnrepository.com/artifact/com.opencsv/opencsv -->
             <dependency>
                 <groupId>com.opencsv</groupId>
@@ -267,6 +273,13 @@
                         <artifactId>jackson-annotations</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <!-- Source: https://mvnrepository.com/artifact/com.konghq/unirest-java -->
+            <dependency>
+                <groupId>com.konghq</groupId>
+                <artifactId>unirest-java</artifactId>
+                <version>3.14.5</version>
+                <scope>compile</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -325,6 +338,10 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
         </dependency>
@@ -335,6 +352,10 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
+        </dependency>
+        <dependency>
+            <groupId>com.konghq</groupId>
+            <artifactId>unirest-java</artifactId>
         </dependency>
     </dependencies>
 

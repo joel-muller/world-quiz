@@ -37,6 +37,10 @@
   }
 }
 
+@if (info()) {
+  <p>{{ info() }}</p>
+}
+
 @if (error()) {
   <p style="color: red">{{ error() }}</p>
 }

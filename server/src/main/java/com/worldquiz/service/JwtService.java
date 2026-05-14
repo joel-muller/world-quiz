@@ -34,7 +34,7 @@ public class JwtService {
 
     private String buildToken(User user, long expirationMs) {
         return Jwts.builder()
-                .subject(user.username())
+                .subject(user.id().toString())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key)
