@@ -13,4 +13,10 @@ import { AuthService } from './auth-service';
 export class App {
   protected readonly authService = inject(AuthService);
   protected readonly title = signal('world-quiz');
+
+  constructor() {
+    if (this.authService.getRefreshToken()) {
+      this.authService.getUser().subscribe();
+    }
+  }
 }
