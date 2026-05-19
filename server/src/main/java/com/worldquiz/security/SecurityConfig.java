@@ -1,6 +1,7 @@
 /* (C)2026 */
 package com.worldquiz.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +40,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter)
             throws Exception {
-
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(
@@ -51,6 +51,12 @@ public class SecurityConfig {
                                         .anyRequest()
                                         .authenticated())
                 .httpBasic(AbstractHttpConfigurer::disable)
+                .exceptionHandling(
+                        ex ->
+                                ex.authenticationEntryPoint(
+                                        (request, response, e) -> {
+                                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                        }))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
