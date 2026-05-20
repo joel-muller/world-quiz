@@ -180,7 +180,6 @@ public class AuthService {
         return AuthResponse.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshToken)
-                .expiresIn(jwtService.getAccessTokenExpirationSeconds())
                 .build();
     }
 }

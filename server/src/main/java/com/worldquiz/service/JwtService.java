@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
-    private static final long ACCESS_TOKEN_EXPIRATION_MS = 1000 * 60 * 60; // 1 hour
-    private static final long REFRESH_TOKEN_EXPIRATION_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
+    private static final long ACCESS_TOKEN_EXPIRATION_MS = 1000 * 60 * 60;
+    private static final long REFRESH_TOKEN_EXPIRATION_MS = 1000 * 60 * 60 * 24 * 7;
 
     @Getter private final SecretKey key;
 
@@ -39,10 +39,6 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key)
                 .compact();
-    }
-
-    public long getAccessTokenExpirationSeconds() {
-        return ACCESS_TOKEN_EXPIRATION_MS / 1000;
     }
 
     public Instant getRefreshTokenExpirationInstant() {
