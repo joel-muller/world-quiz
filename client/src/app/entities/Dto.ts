@@ -11,7 +11,7 @@ export interface AuthResponse {
 export interface CreateQuizRequest {
   categories: Category[];
   tags: Tag[];
-  number?: number;
+  number: number;
 }
 
 export interface FinishGameRequest {

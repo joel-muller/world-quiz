@@ -112,11 +112,13 @@ export class QuizManager {
 
   fetchQuiz() {
     if (!this.quizReady()) return;
+    const maxCards = this.maxCards();
+    if (!maxCards) return;
 
     const request: CreateQuizRequest = {
       categories: this.selectedCategories(),
       tags: this.selectedTags(),
-      number: this.maxCards(),
+      number: maxCards,
     };
 
     this.quizService.fetchQuiz(request).subscribe({
