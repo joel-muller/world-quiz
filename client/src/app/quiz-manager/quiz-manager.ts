@@ -78,6 +78,14 @@ export class QuizManager {
       .map((c) => c.value),
   );
 
+  toggleMaxCards(value: number) {
+    if (this.maxCards() === value) {
+      this.maxCards.set(undefined);
+      return;
+    }
+    this.maxCards.set(value);
+  }
+
   toggleTag(value: Tag) {
     this.tagOptions.update((tags) =>
       tags.map((tag) => (tag.value === value ? { ...tag, selected: !tag.selected } : tag)),

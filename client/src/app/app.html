@@ -4,8 +4,17 @@
       <h1><i class="fa-solid fa-earth-africa"></i> World Quiz</h1>
     </div>
     <div>
-      <button routerLink="/"><i class="fa-solid fa-gamepad"></i></button>
-      <button routerLink="/dashboard"><i class="fa-solid fa-chart-line"></i></button>
+      <button
+        routerLink="/"
+        routerLinkActive="active-route"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <i class="fa-solid fa-gamepad"></i>
+      </button>
+
+      <button routerLink="/dashboard" routerLinkActive="active-route">
+        <i class="fa-solid fa-chart-line"></i>
+      </button>
     </div>
   </header>
 }

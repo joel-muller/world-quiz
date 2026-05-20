@@ -39,10 +39,7 @@ public class CardService {
 
         Collections.shuffle(allCards);
 
-        if (numberOfCards != null) {
-            return allCards.stream().limit(numberOfCards).toList();
-        }
-        return allCards;
+        return allCards.stream().limit(numberOfCards).toList();
     }
 
     private static Card getCard(Place place, Category category) {

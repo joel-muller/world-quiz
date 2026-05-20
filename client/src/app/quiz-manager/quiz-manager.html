@@ -33,8 +33,15 @@
     } @empty {
       <span>No tags available</span>
     }
-    <h2>Start</h2>
-    <input type="number" [(ngModel)]="maxCards" placeholder="Enter max cards" />
+
+    <h2>Number of Cards</h2>
+
+    <button (click)="toggleMaxCards(10)" [class.selected]="maxCards() === 10">10 Cards</button>
+    <button (click)="toggleMaxCards(30)" [class.selected]="maxCards() === 30">30 Cards</button>
+    <button (click)="toggleMaxCards(50)" [class.selected]="maxCards() === 50">50 Cards</button>
+
+    <h2>Start Quiz</h2>
+
     <button [disabled]="!quizReady()" (click)="fetchQuiz()">Start quiz</button>
   }
 } @else {
