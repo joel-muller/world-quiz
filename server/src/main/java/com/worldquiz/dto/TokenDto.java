@@ -4,8 +4,8 @@ package com.worldquiz.dto;
 import lombok.Builder;
 
 @Builder
-public record AuthResponse(String accessToken, String refreshToken, String tokenType) {
-    public AuthResponse {
+public record TokenDto(String accessToken, String refreshToken, String tokenType) {
+    public TokenDto {
         if (tokenType == null) {
             tokenType = "Bearer";
         }

@@ -1,7 +1,7 @@
 /* (C)2026 */
 package com.worldquiz.controller;
 
-import com.worldquiz.dto.UserResponse;
+import com.worldquiz.dto.UserDto;
 import com.worldquiz.entities.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> createGame(@AuthenticationPrincipal User user) {
-        UserResponse response =
-                new UserResponse(user.username(), user.email(), user.emailConfirmed());
+    public ResponseEntity<UserDto> createGame(@AuthenticationPrincipal User user) {
+        UserDto response = new UserDto(user.username(), user.email(), user.emailConfirmed());
         return ResponseEntity.ok(response);
     }
 }

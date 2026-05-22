@@ -9,10 +9,8 @@ import {
   signal,
 } from '@angular/core';
 import { QuizService } from '../quiz-service';
-import { Quiz } from '../entities/Quiz';
-import { Card } from '../entities/Card';
 import { Category } from '../entities/Category';
-import { FinishGameRequest, GameStatResponse } from '../entities/Dto';
+import { CardDto, FinishGameRequest, GameStatDto, QuizDto } from '../entities/Dto';
 
 @Component({
   selector: 'app-quiz-detail',
@@ -21,11 +19,12 @@ import { FinishGameRequest, GameStatResponse } from '../entities/Dto';
   styleUrl: './quiz-detail.css',
 })
 export class QuizDetail {
-  quiz = input.required<Quiz>();
+  quiz = input.required<QuizDto>();
   quizFinished = output<void>();
 
-  cards = signal<Card[]>([]);
-  stats = signal<GameStatResponse | null>(null);
+  cards = signal<CardDto[]>([]);
+  cardsGuessedRight = signal<CardDto[]>([]);
+  stats = signal<GameStatDto | null>(null);
   showBack = signal(false);
 
   private quizService: QuizService = inject(QuizService);
@@ -34,6 +33,7 @@ export class QuizDetail {
     effect(() => {
       const quiz = this.quiz();
       this.cards.set([...quiz.cards]);
+      this.cardsGuessedRight.set([]);
     });
   }
 
@@ -55,12 +55,13 @@ export class QuizDetail {
 
     this.cards.update((cards) => {
       const [front, ...rest] = cards;
-
-      if (!front) {
-        return cards;
+      if (right) {
+        front.guessedRight++;
+        this.cardsGuessedRight.update((cards) => [...cards, front]);
+        return rest;
       }
-
-      return right ? rest : [...rest, front];
+      front.guessedWrong++;
+      return [...rest, front];
     });
 
     this.showBack.set(false);
@@ -93,7 +94,8 @@ export class QuizDetail {
   }
 
   private getStats() {
-    const request: FinishGameRequest = { id: this.quiz().id };
+    const cards = [...this.cards(), ...this.cardsGuessedRight()];
+    const request: FinishGameRequest = { id: this.quiz().id, cards: cards };
     this.quizService.finishGame(request).subscribe({
       next: (stats) => {
         this.stats.set(stats);

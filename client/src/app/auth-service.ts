@@ -3,12 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, switchMap, tap } from 'rxjs';
 import { environment } from '../environments/environment';
 import {
-  AuthResponse,
+  TokenDto,
   LoginRequest,
   RefreshRequest,
   RegisterRequest,
   ResendVerificationRequest,
-  UserResponse,
+  UserDto,
   VerifyEmailRequest,
 } from './entities/Dto';
 
@@ -18,7 +18,7 @@ import {
 export class AuthService {
   private http: HttpClient = inject(HttpClient);
   private token = signal<string | null>(localStorage.getItem('accessToken'));
-  private user = signal<UserResponse | null>(JSON.parse(localStorage.getItem('user') || 'null'));
+  private user = signal<UserDto | null>(JSON.parse(localStorage.getItem('user') || 'null'));
 
   currentUser = computed(() => this.user());
 
@@ -26,8 +26,8 @@ export class AuthService {
     return this.token() !== null;
   });
 
-  getUser(): Observable<UserResponse> {
-    return this.http.get<UserResponse>(`${environment.apiUrl}/user/me`).pipe(
+  getUser(): Observable<UserDto> {
+    return this.http.get<UserDto>(`${environment.apiUrl}/user/me`).pipe(
       tap((user) => {
         this.user.set(user);
         localStorage.setItem('user', JSON.stringify(user));
@@ -39,16 +39,16 @@ export class AuthService {
     return this.http.post(`${environment.apiUrl}/auth/register`, request);
   }
 
-  login(request: LoginRequest): Observable<UserResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, request).pipe(
+  login(request: LoginRequest): Observable<UserDto> {
+    return this.http.post<TokenDto>(`${environment.apiUrl}/auth/login`, request).pipe(
       tap((res) => this.setTokens(res)),
       switchMap(() => this.getUser()),
     );
   }
 
-  refresh(request: RefreshRequest): Observable<AuthResponse> {
+  refresh(request: RefreshRequest): Observable<TokenDto> {
     return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/refresh`, request)
+      .post<TokenDto>(`${environment.apiUrl}/auth/refresh`, request)
       .pipe(tap((res) => this.setTokens(res)));
   }
 
@@ -73,7 +73,7 @@ export class AuthService {
     return localStorage.getItem('refreshToken');
   }
 
-  setTokens(res: AuthResponse) {
+  setTokens(res: TokenDto) {
     localStorage.setItem('accessToken', res.accessToken);
     localStorage.setItem('refreshToken', res.refreshToken);
     this.token.set(res.accessToken);

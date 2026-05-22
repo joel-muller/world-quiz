@@ -1,11 +1,10 @@
 /* (C)2026 */
 package com.worldquiz.service;
 
-import com.worldquiz.entities.Card;
+import com.worldquiz.dto.CardDto;
 import com.worldquiz.entities.Category;
 import com.worldquiz.entities.Place;
 import com.worldquiz.entities.Tag;
-import com.worldquiz.reader.PlaceReader;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -16,88 +15,77 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class CardService {
-    private final PlaceReader placeReader;
+    private final PlaceService placeService;
 
-    public List<Card> getCards(Integer numberOfCards, List<Category> categories, List<Tag> tags) {
+    public List<CardDto> getCards(
+            Integer numberOfCards, List<Category> categories, List<Tag> tags) {
         Objects.requireNonNull(categories);
         Objects.requireNonNull(tags);
 
-        List<Card> allCards =
+        List<CardDto> allCards =
                 new ArrayList<>(
                         categories.stream()
                                 .flatMap(
                                         category ->
-                                                this.placeReader.getPlaces().stream()
-                                                        .filter(
-                                                                place ->
-                                                                        isCategory(place, category)
-                                                                                && hasAtLeastOneTag(
-                                                                                        place,
-                                                                                        tags))
+                                                this.placeService
+                                                        .getPlacesByTagsAndCategories(
+                                                                category, tags)
+                                                        .stream()
                                                         .map(place -> getCard(place, category)))
                                 .toList());
-
         Collections.shuffle(allCards);
 
         return allCards.stream().limit(numberOfCards).toList();
     }
 
-    private static Card getCard(Place place, Category category) {
+    private static CardDto getCard(Place place, Category category) {
         return switch (category) {
             case MAP_NAME ->
-                    new Card(
-                            place.id(),
-                            category,
-                            place.maps(),
-                            null,
-                            place.nameWithCapital(),
-                            mergeInfos(Arrays.asList(place.placeInfo(), place.capitalInfo())));
+                    CardDto.builder()
+                            .placeId(place.id())
+                            .category(category)
+                            .front(place.maps())
+                            .back(place.nameWithCapital())
+                            .infoBack(
+                                    mergeInfos(
+                                            Arrays.asList(place.placeInfo(), place.capitalInfo())))
+                            .build();
             case FLAG_NAME ->
-                    new Card(
-                            place.id(),
-                            category,
-                            place.flag(),
-                            null,
-                            place.nameWithCapital(),
-                            mergeInfos(
-                                    Arrays.asList(
-                                            place.placeInfo(),
-                                            place.capitalInfo(),
-                                            place.flagInfo())));
+                    CardDto.builder()
+                            .placeId(place.id())
+                            .category(category)
+                            .front(place.flag())
+                            .back(place.nameWithCapital())
+                            .infoBack(
+                                    mergeInfos(
+                                            Arrays.asList(
+                                                    place.placeInfo(),
+                                                    place.capitalInfo(),
+                                                    place.flagInfo())))
+                            .build();
             case CAPITAL_NAME ->
-                    new Card(
-                            place.id(),
-                            category,
-                            place.capital(),
-                            place.capitalInfo(),
-                            place.name(),
-                            place.placeInfo());
+                    CardDto.builder()
+                            .placeId(place.id())
+                            .category(category)
+                            .front(place.capital())
+                            .infoFront(place.capitalInfo())
+                            .back(place.name())
+                            .infoBack(place.placeInfo())
+                            .build();
             case NAME_CAPITAL ->
-                    new Card(
-                            place.id(),
-                            category,
-                            place.name(),
-                            place.placeInfo(),
-                            place.capital(),
-                            place.capitalInfo());
+                    CardDto.builder()
+                            .placeId(place.id())
+                            .category(category)
+                            .front(place.name())
+                            .infoFront(place.placeInfo())
+                            .back(place.capital())
+                            .infoBack(place.capitalInfo())
+                            .build();
         };
     }
 
     private static String mergeInfos(List<String> infos) {
         String info = infos.stream().filter(Objects::nonNull).collect(Collectors.joining(" "));
         return info.isEmpty() ? null : info;
-    }
-
-    private static boolean isCategory(Place place, Category category) {
-        return switch (category) {
-            case MAP_NAME -> place.maps() != null;
-            case FLAG_NAME -> place.flag() != null;
-            case CAPITAL_NAME, NAME_CAPITAL -> place.capital() != null;
-        };
-    }
-
-    private static boolean hasAtLeastOneTag(Place place, List<Tag> tags) {
-        Set<Tag> tagsSet = Set.copyOf(tags);
-        return place.tags().stream().anyMatch(tagsSet::contains);
     }
 }

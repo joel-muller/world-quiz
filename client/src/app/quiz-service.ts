@@ -1,9 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Quiz } from './entities/Quiz';
 import { environment } from '../environments/environment';
-import { CreateQuizRequest, FinishGameRequest, GameStatResponse } from './entities/Dto';
+import { CreateQuizRequest, FinishGameRequest, GameStatDto, QuizDto } from './entities/Dto';
 
 @Injectable({
   providedIn: 'root',
@@ -11,11 +10,11 @@ import { CreateQuizRequest, FinishGameRequest, GameStatResponse } from './entiti
 export class QuizService {
   private http: HttpClient = inject(HttpClient);
 
-  fetchQuiz(request: CreateQuizRequest): Observable<Quiz> {
-    return this.http.post<Quiz>(`${environment.apiUrl}/quiz/create`, request);
+  fetchQuiz(request: CreateQuizRequest): Observable<QuizDto> {
+    return this.http.post<QuizDto>(`${environment.apiUrl}/quiz/create`, request);
   }
 
-  finishGame(request: FinishGameRequest): Observable<GameStatResponse> {
-    return this.http.post<GameStatResponse>(`${environment.apiUrl}/quiz/finish`, request);
+  finishGame(request: FinishGameRequest): Observable<GameStatDto> {
+    return this.http.post<GameStatDto>(`${environment.apiUrl}/quiz/finish`, request);
   }
 }

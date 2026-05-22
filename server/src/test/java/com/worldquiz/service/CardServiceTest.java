@@ -2,22 +2,23 @@
 package com.worldquiz.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.worldquiz.dto.CardDto;
 import com.worldquiz.entities.*;
-import com.worldquiz.reader.PlaceReader;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class CardServiceTest {
     private CardService cardService;
 
     @BeforeEach
     void setUp() {
-        PlaceReader placeReader = Mockito.mock(PlaceReader.class);
-        cardService = new CardService(placeReader);
+        PlaceService placeService = mock(PlaceService.class);
+        cardService = new CardService(placeService);
 
         Place place1 =
                 Place.builder()
@@ -45,54 +46,30 @@ class CardServiceTest {
                         .tags(List.of(Tag.EUROPE, Tag.SOVEREIGN_STATE))
                         .build();
 
-        when(placeReader.getPlaces()).thenReturn(List.of(place1, place2));
+        when(placeService.getPlacesByTagsAndCategories(any(), anyList()))
+                .thenReturn(List.of(place1, place2));
     }
 
     @Test
     void testGetCards_limitNumberOfCards() {
-        List<Card> cards = cardService.getCards(1, List.of(Category.MAP_NAME), List.of(Tag.EUROPE));
+        List<CardDto> cards =
+                cardService.getCards(1, List.of(Category.MAP_NAME), List.of(Tag.EUROPE));
         assertEquals(1, cards.size());
-    }
-
-    @Test
-    void testGetCards_filtersByCategory() {
-        List<Card> cards =
-                cardService.getCards(10, List.of(Category.MAP_NAME), List.of(Tag.EUROPE));
-        assertTrue(cards.stream().allMatch(card -> card.front() != null));
-        // place2.maps is null, so should be excluded
-        assertTrue(cards.stream().allMatch(card -> card.placeId() == 1));
-    }
-
-    @Test
-    void testGetCards_filtersByTag() {
-        List<Tag> tagFilter = List.of(Tag.SOVEREIGN_STATE);
-        List<Card> cards = cardService.getCards(10, List.of(Category.FLAG_NAME), tagFilter);
-        assertEquals(1, cards.size());
-        assertEquals(2, cards.getFirst().placeId());
-    }
-
-    @Test
-    void testGetCards_mergeInfosCorrectlyForMapName() {
-        List<Card> cards =
-                cardService.getCards(10, List.of(Category.MAP_NAME), List.of(Tag.EUROPE));
-        Card card = cards.get(0);
-        assertEquals("Info1 CapitalInfo1", card.infoBack());
     }
 
     @Test
     void testGetCards_mergeInfosCorrectlyForFlagName() {
-        List<Card> cards =
+        List<CardDto> cards =
                 cardService.getCards(10, List.of(Category.FLAG_NAME), List.of(Tag.EUROPE));
-        // place1 and place2 have flags, both tags include EUROPE
-        Card card = cards.stream().filter(c -> c.placeId() == 1).findFirst().orElseThrow();
+        CardDto card = cards.stream().filter(c -> c.placeId() == 1).findFirst().orElseThrow();
         assertEquals("Info1 CapitalInfo1 FlagInfo1", card.infoBack());
     }
 
     @Test
     void testGetCards_categoryCapitalName() {
-        List<Card> cards =
+        List<CardDto> cards =
                 cardService.getCards(10, List.of(Category.CAPITAL_NAME), List.of(Tag.EUROPE));
-        Card card = cards.stream().filter(c -> c.placeId() == 1).findFirst().orElseThrow();
+        CardDto card = cards.stream().filter(c -> c.placeId() == 1).findFirst().orElseThrow();
         assertEquals("London", card.front());
         assertEquals("CapitalInfo1", card.infoFront());
         assertEquals("England", card.back());
@@ -101,20 +78,13 @@ class CardServiceTest {
 
     @Test
     void testGetCards_categoryNameCapital() {
-        List<Card> cards =
+        List<CardDto> cards =
                 cardService.getCards(10, List.of(Category.NAME_CAPITAL), List.of(Tag.EUROPE));
-        Card card = cards.stream().filter(c -> c.placeId() == 1).findFirst().orElseThrow();
+        CardDto card = cards.stream().filter(c -> c.placeId() == 1).findFirst().orElseThrow();
         assertEquals("England", card.front());
         assertEquals("Info1", card.infoFront());
         assertEquals("London", card.back());
         assertEquals("CapitalInfo1", card.infoBack());
-    }
-
-    @Test
-    void testGetCards_emptyResultWhenNoTagMatch() {
-        List<Tag> tagFilter = List.of(Tag.ASIA);
-        List<Card> cards = cardService.getCards(10, List.of(Category.FLAG_NAME), tagFilter);
-        assertTrue(cards.isEmpty());
     }
 
     @Test

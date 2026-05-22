@@ -1,7 +1,7 @@
 import { Category } from './Category';
 import { Tag } from './Tag';
 
-export interface AuthResponse {
+export interface TokenDto {
   accessToken: string;
   refreshToken: string;
   tokenType: string;
@@ -15,9 +15,10 @@ export interface CreateQuizRequest {
 
 export interface FinishGameRequest {
   id: string;
+  cards: CardDto[];
 }
 
-export interface GameStatResponse {
+export interface GameStatDto {
   id: string;
   info: string;
 }
@@ -41,7 +42,7 @@ export interface ResendVerificationRequest {
   email: string;
 }
 
-export interface UserResponse {
+export interface UserDto {
   username: string;
   email: string;
   emailConfirmed: boolean;
@@ -49,4 +50,20 @@ export interface UserResponse {
 
 export interface VerifyEmailRequest {
   token: string;
+}
+
+export interface CardDto {
+  placeId: number;
+  category: Category;
+  front: string;
+  infoFront: string;
+  back: string;
+  infoBack: string;
+  guessedRight: number;
+  guessedWrong: number;
+}
+
+export interface QuizDto {
+  id: string;
+  cards: CardDto[];
 }

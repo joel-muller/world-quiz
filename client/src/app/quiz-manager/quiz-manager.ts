@@ -1,12 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { QuizService } from '../quiz-service';
 import { QuizDetail } from '../quiz-detail/quiz-detail';
-import { Quiz } from '../entities/Quiz';
 import { Tag } from '../entities/Tag';
 import { Category } from '../entities/Category';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth-service';
-import { CreateQuizRequest } from '../entities/Dto';
+import { CreateQuizRequest, QuizDto } from '../entities/Dto';
 
 interface TagOption {
   name: string;
@@ -36,7 +35,7 @@ export class QuizManager {
 
   verificationMailSent = signal(false);
 
-  quiz = signal<Quiz | null>(null);
+  quiz = signal<QuizDto | null>(null);
   currentError = signal<string | null>(null);
   maxCards = signal<number | undefined>(undefined);
 

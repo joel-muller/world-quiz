@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler({UserNotFoundException.class, ValidationException.class})
+    @ExceptionHandler({
+        UserNotFoundException.class,
+        ValidationException.class,
+        QuizBelongsNotToUserException.class
+    })
     public ResponseEntity<?> handleAuthFailures(RuntimeException ex) {
         // Do not reveal whether the user exists to prevent user enumeration attacks
         return build(HttpStatus.UNAUTHORIZED, "Invalid credentials");
@@ -32,9 +36,14 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, ex.getMessage());
     }
 
-    @ExceptionHandler(TooManyMailsSent.class)
-    public ResponseEntity<?> handleTooManyMailsSent(TooManyMailsSent ex) {
+    @ExceptionHandler(TooManyMailsSentException.class)
+    public ResponseEntity<?> handleTooManyMailsSent(TooManyMailsSentException ex) {
         return build(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+    }
+
+    @ExceptionHandler(QuizNotFoundException.class)
+    public ResponseEntity<?> handleQuizNotFound(TooManyMailsSentException ex) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

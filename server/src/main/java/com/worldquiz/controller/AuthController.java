@@ -23,14 +23,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        AuthResponse response = authService.login(request);
+    public ResponseEntity<TokenDto> login(@RequestBody LoginRequest request) {
+        TokenDto response = authService.login(request);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshRequest request) {
-        AuthResponse response = authService.refresh(request.refreshToken());
+    public ResponseEntity<TokenDto> refresh(@RequestBody RefreshRequest request) {
+        TokenDto response = authService.refresh(request.refreshToken());
         return ResponseEntity.ok(response);
     }
 

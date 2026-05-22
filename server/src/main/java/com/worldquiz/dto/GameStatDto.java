@@ -3,4 +3,4 @@ package com.worldquiz.dto;
 
 import java.util.UUID;
 
-public record GameStatResponse(UUID id, String info) {}
+public record GameStatDto(UUID id, String info) {}
