@@ -17,6 +17,13 @@ import org.springframework.stereotype.Service;
 public class PlaceService {
     private final PlaceReader placeReader;
 
+    public Place getPlace(int placeId) {
+        return this.placeReader.getPlaces().stream()
+                .filter(p -> p.id() == placeId)
+                .findFirst()
+                .orElse(null);
+    }
+
     public List<Place> getPlacesByTagsAndCategories(Category category, List<Tag> tags) {
         return this.placeReader.getPlaces().stream()
                 .filter(place -> isCategory(place, category) && hasAtLeastOneTag(place, tags))

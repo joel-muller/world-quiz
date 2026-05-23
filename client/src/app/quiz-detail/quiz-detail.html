@@ -66,6 +66,28 @@
 
   @if (this.stats(); as stats) {
     <p>{{ stats.info }}</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Place</th>
+          <th>Category</th>
+          <th>Right</th>
+          <th>Wrong</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (card of this.statsSorted(); track $index) {
+          <tr>
+            <td>{{ card.placeName }}</td>
+            <td>{{ getCategoryName(card.category) }}</td>
+            <td>{{ card.guessedRight }}</td>
+            <td>{{ card.guessedWrong }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
   }
   <button class="btn btn-secondary" (click)="closeQuiz()">Close</button>
 }

@@ -90,9 +90,11 @@ public class GameService {
         Quiz updatedQuiz =
                 new Quiz(quiz.id(), quiz.userId(), updatedCards, quiz.createdAt(), Instant.now());
 
+        List<CardStatDto> stats = statsService.getCardStats(updatedCards);
+
         statsService.updateStats(updatedCards, user);
         quizRepository.save(updatedQuiz);
         log.info("Quiz {} successfully finished", quiz.id());
-        return new GameStatDto(request.id(), "Well done");
+        return new GameStatDto(request.id(), "Well done", stats);
     }
 }

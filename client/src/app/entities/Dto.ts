@@ -21,6 +21,14 @@ export interface FinishGameRequest {
 export interface GameStatDto {
   id: string;
   info: string;
+  cards: CardStatDto[];
+}
+
+export interface CardStatDto {
+  placeName: string;
+  category: Category;
+  guessedRight: number;
+  guessedWrong: number;
 }
 
 export interface LoginRequest {

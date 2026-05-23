@@ -43,6 +43,12 @@ export class QuizDetail {
     this.showBack() ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye',
   );
 
+  readonly statsSorted = computed(() => {
+    const stats = this.stats();
+    if (!stats) return [];
+    return [...stats.cards].sort((a, b) => a.guessedWrong - b.guessedWrong);
+  });
+
   toggleBack() {
     this.showBack.update((v) => !v);
   }
@@ -101,6 +107,19 @@ export class QuizDetail {
         this.stats.set(stats);
       },
     });
+  }
+
+  getCategoryName(category: Category) {
+    switch (category) {
+      case Category.CAPITAL_NAME:
+        return 'Capital → Name';
+      case Category.FLAG_NAME:
+        return 'Flag → Name (Capital)';
+      case Category.MAP_NAME:
+        return 'Map → Name (Capital)';
+      case Category.NAME_CAPITAL:
+        return 'Name → Capital';
+    }
   }
 
   protected readonly Category = Category;

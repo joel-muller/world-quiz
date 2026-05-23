@@ -16,6 +16,24 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class StatsService {
     private final CardStatUserRepository cardStatUserRepository;
+    private final PlaceService placeService;
+
+    public List<CardStatDto> getCardStats(List<CardStat> cardStats) {
+        return cardStats.stream()
+                .map(
+                        c -> {
+                            Place place = this.placeService.getPlace(c.placeId());
+                            return place == null
+                                    ? null
+                                    : new CardStatDto(
+                                            place.name(),
+                                            c.category(),
+                                            c.guessedRight(),
+                                            c.guessedWrong());
+                        })
+                .filter(Objects::nonNull)
+                .toList();
+    }
 
     public void updateStats(List<CardStat> cardStats, User user) {
         List<CardStatUser> existingStats = cardStatUserRepository.findAllByUserid(user.id());
