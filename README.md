@@ -1,6 +1,6 @@
 # World-Quiz
 
-With World Quiz, you can learn the Capital, Maps and Flag from all over the world.
+With World Quiz, you can learn the Capital, Maps and Flag from all over the world. The data of the app is from the [Ultimate Geograpy](https://github.com/anki-geo/ultimate-geography) Anki Deck, where i learned it myself.
 
 ## Deployment
 
