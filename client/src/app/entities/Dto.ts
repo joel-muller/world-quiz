@@ -13,12 +13,12 @@ export interface CreateQuizRequest {
   number: number;
 }
 
-export interface FinishGameRequest {
+export interface FinishQuizRequest {
   id: string;
   cards: CardDto[];
 }
 
-export interface GameStatDto {
+export interface QuizStatDto {
   id: string;
   info: string;
   cards: CardStatDto[];
@@ -74,4 +74,13 @@ export interface CardDto {
 export interface QuizDto {
   id: string;
   cards: CardDto[];
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
 }

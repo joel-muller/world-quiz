@@ -21,12 +21,12 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class GameServiceTest {
+class QuizServiceTest {
     @Mock private CardService cardService;
     @Mock private QuizRepository quizRepository;
     @Mock private StatsService statsService;
 
-    @InjectMocks private GameService gameService;
+    @InjectMocks private QuizService quizService;
 
     private User user;
 
@@ -45,7 +45,7 @@ class GameServiceTest {
 
         when(cardService.getCards(2, request.categories(), request.tags())).thenReturn(cards);
 
-        QuizDto result = gameService.createGame(request, user);
+        QuizDto result = quizService.createGame(request, user);
 
         assertThat(result).isNotNull();
         assertThat(result.cards()).hasSize(2);
@@ -69,11 +69,11 @@ class GameServiceTest {
         CardStat existingCard = new CardStat(1, Category.MAP_NAME, 1, 0);
         Quiz quiz = new Quiz(quizId, user.id(), List.of(existingCard), Instant.now(), null);
 
-        FinishGameRequest request = new FinishGameRequest(quizId, List.of(card(1, 3, 1)));
+        FinishQuizRequest request = new FinishQuizRequest(quizId, List.of(card(1, 3, 1)));
 
         when(quizRepository.findById(quizId)).thenReturn(Optional.of(quiz));
 
-        GameStatDto result = gameService.finishGame(request, user);
+        QuizStatDto result = quizService.finishGame(request, user);
 
         assertThat(result.id()).isEqualTo(quizId);
         assertThat(result.info()).isEqualTo("Well done");
@@ -99,11 +99,11 @@ class GameServiceTest {
     void finishGame_shouldThrowWhenQuizNotFound() {
         UUID quizId = UUID.randomUUID();
 
-        FinishGameRequest request = new FinishGameRequest(quizId, List.of());
+        FinishQuizRequest request = new FinishQuizRequest(quizId, List.of());
 
         when(quizRepository.findById(quizId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> gameService.finishGame(request, user))
+        assertThatThrownBy(() -> quizService.finishGame(request, user))
                 .isInstanceOf(QuizNotFoundException.class)
                 .hasMessage("Quiz not found with the id: " + quizId);
 
@@ -120,11 +120,11 @@ class GameServiceTest {
 
         Quiz quiz = new Quiz(quizId, anotherUser.id(), List.of(), Instant.now(), null);
 
-        FinishGameRequest request = new FinishGameRequest(quizId, List.of());
+        FinishQuizRequest request = new FinishQuizRequest(quizId, List.of());
 
         when(quizRepository.findById(quizId)).thenReturn(Optional.of(quiz));
 
-        assertThatThrownBy(() -> gameService.finishGame(request, user))
+        assertThatThrownBy(() -> quizService.finishGame(request, user))
                 .isInstanceOf(QuizBelongsNotToUserException.class)
                 .hasMessage("Quiz doesn't belong to user with the id: " + quizId);
 
@@ -140,11 +140,11 @@ class GameServiceTest {
 
         Quiz quiz = new Quiz(quizId, user.id(), List.of(unchanged), Instant.now(), null);
 
-        FinishGameRequest request = new FinishGameRequest(quizId, List.of(card(999, 5, 5)));
+        FinishQuizRequest request = new FinishQuizRequest(quizId, List.of(card(999, 5, 5)));
 
         when(quizRepository.findById(quizId)).thenReturn(Optional.of(quiz));
 
-        gameService.finishGame(request, user);
+        quizService.finishGame(request, user);
 
         ArgumentCaptor<Quiz> quizCaptor = ArgumentCaptor.forClass(Quiz.class);
 

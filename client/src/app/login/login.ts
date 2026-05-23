@@ -7,6 +7,7 @@ import { RegisterRequest } from '../entities/Dto';
 enum Page {
   Login,
   Register,
+  ForgotPassword,
 }
 
 @Component({
@@ -36,6 +37,13 @@ export class Login {
     password1: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     password2: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     email: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+  });
+
+  forgotPasswordForm = new FormGroup({
+    email: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.email],
+    }),
   });
 
   login() {
@@ -82,6 +90,25 @@ export class Login {
       error: () => {
         this.loading.set(false);
         this.error.set('Registration failed');
+      },
+    });
+  }
+
+  forgotPassword() {
+    if (this.forgotPasswordForm.invalid) return;
+
+    this.loading.set(true);
+    this.error.set(null);
+    this.info.set(null);
+
+    this.authService.forgotPassword(this.forgotPasswordForm.getRawValue()).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.info.set('Password reset email sent');
+      },
+      error: () => {
+        this.loading.set(false);
+        this.error.set('Failed to send password reset email');
       },
     });
   }

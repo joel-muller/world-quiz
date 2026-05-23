@@ -47,4 +47,18 @@ public class AuthController {
         authService.resendVerification(request.email(), frontendBaseUrl);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(
+            @RequestBody ForgotPasswordRequest request, HttpServletRequest httpRequest) {
+        String frontendBaseUrl = httpRequest.getHeader("Origin");
+        authService.forgotPassword(request.email(), frontendBaseUrl);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok().build();
+    }
 }

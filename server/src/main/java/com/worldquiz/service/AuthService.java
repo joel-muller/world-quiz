@@ -1,19 +1,10 @@
 /* (C)2026 */
 package com.worldquiz.service;
 
-import com.worldquiz.dto.LoginRequest;
-import com.worldquiz.dto.RegisterRequest;
-import com.worldquiz.dto.TokenDto;
-import com.worldquiz.dto.VerifyEmailRequest;
-import com.worldquiz.entities.EmailSendLog;
-import com.worldquiz.entities.EmailVerificationToken;
-import com.worldquiz.entities.RefreshToken;
-import com.worldquiz.entities.User;
+import com.worldquiz.dto.*;
+import com.worldquiz.entities.*;
 import com.worldquiz.exceptions.*;
-import com.worldquiz.repository.EmailSendLogRepository;
-import com.worldquiz.repository.EmailVerificationTokenRepository;
-import com.worldquiz.repository.RefreshTokenRepository;
-import com.worldquiz.repository.UserRepository;
+import com.worldquiz.repository.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -37,6 +28,7 @@ public class AuthService {
     private final MailService mailService;
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final EmailSendLogRepository emailSendLogRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Value("${mailgun.threshold.max}")
     private int maxNumberOfMails;
@@ -172,6 +164,59 @@ public class AuthService {
                                 });
 
         sendVerification(user, frontendBaseUrl);
+    }
+
+    public void forgotPassword(String email, String frontendBaseUrl) {
+        log.info("Forgot password request email={}", email);
+
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        String token = UUID.randomUUID().toString();
+
+        Instant expiration = Instant.now().plus(Duration.ofHours(1));
+
+        PasswordResetToken resetToken =
+                new PasswordResetToken(
+                        UUID.randomUUID(), user.id(), token, expiration, Instant.now());
+
+        passwordResetTokenRepository.deleteAllByUserId(user.id());
+
+        passwordResetTokenRepository.save(resetToken);
+
+        mailService.sendPasswordResetMail(user.username(), user.email(), token, frontendBaseUrl);
+
+        log.info("Password reset email sent userId={}", user.id());
+    }
+
+    public void resetPassword(ResetPasswordRequest request) {
+        log.info("Reset password attempt");
+
+        PasswordResetToken token =
+                passwordResetTokenRepository
+                        .findByToken(request.token())
+                        .orElseThrow(() -> new InvalidTokenException("Invalid token"));
+
+        if (token.expiresAt().isBefore(Instant.now())) {
+            throw new TokenExpiredException("Reset token expired");
+        }
+
+        User user =
+                userRepository
+                        .findById(token.userId())
+                        .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        String hashedPassword = passwordEncoder.encode(request.newPassword());
+
+        User updatedUser = user.withNewPassword(hashedPassword);
+
+        userRepository.save(updatedUser);
+        passwordResetTokenRepository.deleteByToken(token.token());
+        refreshTokenRepository.deleteByUserId(user.id());
+
+        log.info("Password reset successful userId={}", user.id());
     }
 
     private void sendVerification(User user, String frontendBaseUrl) {

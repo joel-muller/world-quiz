@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GameService {
+public class QuizService {
     private final CardService cardService;
     private final QuizRepository quizRepository;
     private final StatsService statsService;
@@ -36,7 +36,7 @@ public class GameService {
         return quizDto;
     }
 
-    public GameStatDto finishGame(FinishGameRequest request, User user) {
+    public QuizStatDto finishGame(FinishQuizRequest request, User user) {
         log.info("Finishing quiz {} for user {}", request.id(), user.id());
         Quiz quiz =
                 quizRepository
@@ -95,6 +95,6 @@ public class GameService {
         statsService.updateStats(updatedCards, user);
         quizRepository.save(updatedQuiz);
         log.info("Quiz {} successfully finished", quiz.id());
-        return new GameStatDto(request.id(), "Well done", stats);
+        return new QuizStatDto(request.id(), "Well done", stats);
     }
 }

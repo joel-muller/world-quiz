@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { QuizService } from '../quiz-service';
 import { Category } from '../entities/Category';
-import { CardDto, FinishGameRequest, GameStatDto, QuizDto } from '../entities/Dto';
+import { CardDto, FinishQuizRequest, QuizStatDto, QuizDto } from '../entities/Dto';
 
 @Component({
   selector: 'app-quiz-detail',
@@ -24,7 +24,7 @@ export class QuizDetail {
 
   cards = signal<CardDto[]>([]);
   cardsGuessedRight = signal<CardDto[]>([]);
-  stats = signal<GameStatDto | null>(null);
+  stats = signal<QuizStatDto | null>(null);
   showBack = signal(false);
 
   private quizService: QuizService = inject(QuizService);
@@ -101,7 +101,7 @@ export class QuizDetail {
 
   private getStats() {
     const cards = [...this.cards(), ...this.cardsGuessedRight()];
-    const request: FinishGameRequest = { id: this.quiz().id, cards: cards };
+    const request: FinishQuizRequest = { id: this.quiz().id, cards: cards };
     this.quizService.finishGame(request).subscribe({
       next: (stats) => {
         this.stats.set(stats);

@@ -4,4 +4,4 @@ package com.worldquiz.dto;
 import java.util.List;
 import java.util.UUID;
 
-public record FinishGameRequest(UUID id, List<CardDto> cards) {}
+public record QuizStatDto(UUID id, String info, List<CardStatDto> cards) {}

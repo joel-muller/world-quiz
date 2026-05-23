@@ -11,4 +11,8 @@ public record User(
     public User confirmEmail() {
         return new User(id, username, email, password, true);
     }
+
+    public User withNewPassword(String password) {
+        return new User(id, username, email, password, emailConfirmed);
+    }
 }

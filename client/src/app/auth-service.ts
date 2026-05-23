@@ -10,6 +10,8 @@ import {
   ResendVerificationRequest,
   UserDto,
   VerifyEmailRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
 } from './entities/Dto';
 
 @Injectable({
@@ -58,6 +60,14 @@ export class AuthService {
 
   resendVerification(request: ResendVerificationRequest) {
     return this.http.post(`${environment.apiUrl}/auth/resend-verification`, request);
+  }
+
+  forgotPassword(request: ForgotPasswordRequest) {
+    return this.http.post(`${environment.apiUrl}/auth/forgot-password`, request);
+  }
+
+  resetPassword(request: ResetPasswordRequest) {
+    return this.http.post(`${environment.apiUrl}/auth/reset-password`, request);
   }
 
   logout() {
