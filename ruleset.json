@@ -3,7 +3,7 @@
   "name": "protect main branch",
   "target": "branch",
   "source_type": "Repository",
-  "source": "joel-muller/world-quiz",
+  "source": "mullerjoel/world-quiz",
   "enforcement": "active",
   "conditions": {
     "ref_name": {
