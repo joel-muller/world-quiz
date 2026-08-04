@@ -7,6 +7,7 @@ tmux new-window -t "$SESSION" -n server
 tmux new-window -t "$SESSION" -n client
 
 tmux send-keys -t "$SESSION":docker "cd ~/world-quiz/server/local" C-m
+tmux send-keys -t "$SESSION":docker "limactl start docker && limactl shell docker" C-m
 tmux send-keys -t "$SESSION":server "cd ~/world-quiz/server" C-m
 tmux send-keys -t "$SESSION":client "cd ~/world-quiz/client" C-m
 
