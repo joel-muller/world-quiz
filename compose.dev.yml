@@ -1,0 +1,53 @@
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
+      ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
+    depends_on:
+      - mongo
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - "127.0.0.1:4200:4200"
+      - "127.0.0.1:2221:22"
+    volumes:
+      - ./client:/workspace
+    tty: true
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:2222:22"
+    volumes:
+      - ./server:/workspace
+    depends_on:
+      - mongo
+    tty: true
+
+volumes:
+  mongo-data:

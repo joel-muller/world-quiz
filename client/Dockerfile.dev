@@ -1,0 +1,15 @@
+FROM node:20-bullseye
+
+RUN apt-get update
+RUN apt-get install -y openssh-server git
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN npm install -g @angular/cli
+
+RUN useradd -m -s /bin/bash dev && echo "dev:dev" | chpasswd
+RUN mkdir -p /var/run/sshd
+
+WORKDIR /workspace
+EXPOSE 22 4200
+
+CMD ["/usr/sbin/sshd", "-D"]

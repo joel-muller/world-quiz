@@ -33,3 +33,14 @@ MAILGUN_LIMIT_PER_DAY_PER_USER=4
 ```shell
 openssl rand -base64 32
 ```
+
+## Devcontainer
+
+```shell
+docker compose -f compose.dev.yml up -d --build
+```
+
+```shell
+ssh -p 2221 dev@localhost
+ssh -p 2222 dev@localhost
+```
